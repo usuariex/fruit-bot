@@ -1,0 +1,65 @@
+
+# Archivos generales
+
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# Node modules para backend y React
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+# Android / Gradle
+
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/local.properties
+**/android/.idea/
+**/android/captures/
+**/android/.externalNativeBuild/
+**/android/.cxx/
+**/android/.signing/
+**/android/*.iml
+
+# app-web
+
+**/app-web/build/
+**/app-web/.cache/
+**/app-web/.next/
+**/app-web/out/
+**/app-web/.env.local
+**/app-web/.env.development.local
+**/app-web/.env.test.local
+**/app-web/.env.production.local
+
+
+# backend
+
+**/backend/dist/
+**/backend/build/
+**/backend/.env
+**/backend/.env.local
+**/backend/coverage/
+
+
+# IDEs
+
+.vscode/
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+
+# SO 
+ehthumbs.db
+Icon?
+Desktop.ini
