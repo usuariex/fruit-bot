@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "FrutyBot"
 include(":app")
- 
+include(":domain")
+include(":data")
