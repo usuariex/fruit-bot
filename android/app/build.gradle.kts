@@ -52,15 +52,10 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
 
-    implementation(project(":domain"))
-    implementation(project(":data"))
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-
-
-    //implementation(libs.androidx.lifecycle.viewmodel)
-    //implementation(libs.androidx.lifecycle.livedata)
-
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.core.ktx)
 }
