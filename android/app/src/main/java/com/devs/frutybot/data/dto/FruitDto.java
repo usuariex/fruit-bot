@@ -1,15 +1,31 @@
 package com.devs.frutybot.data.dto;
 
-public class FruitDto {
-    private String id;
-    private String name;
-    private String color;
-    private double weight;
-    private String origin;
+import com.google.gson.annotations.SerializedName;
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public String getColor() { return color; }
-    public double getWeight() { return weight; }
-    public String getOrigin() { return origin; }
+public class FruitDto {
+    @SerializedName("FRUTA_ID")
+    private int id;
+
+    @SerializedName("NOMBRE")
+    private String nombre;
+
+    @SerializedName("URL_IMG")
+    private String imagen;
+
+    @SerializedName("DESCRIPCION")
+    private String descripcion;
+
+    @SerializedName("departamento_nombre")
+    private String departamentoNombre;
+
+    @SerializedName("departamento_descripcion")
+    private String departamentoDescripcion;
+
+    // getters
+    public int getId() { return id; }
+    public String getNombre() { return nombre; }
+    public String getImagen() { return imagen; }
+    public String getDescripcion() { return descripcion; }
+    public String getDepartamentoNombre() { return departamentoNombre; }
+    public String getDepartamentoDescripcion() { return departamentoDescripcion; }
 }
