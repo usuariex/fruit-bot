@@ -1,11 +1,29 @@
-const express = require('express');
+import express, { json } from 'express';
+import cors from 'cors';
+import frutaRoutes from './routes/frutaRoutes.js';
+import pruevaServer from './routes/pruevaServer.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 const app = express();
-const port = process.env.PORT || 3000;
+app.use(cors());
+app.use(express.json()); 
 
-app.get('/', (req, res) => {
-  res.send('¡Hola desde el backend organizado!');
+app.use('/', pruevaServer);
+app.use('/frutas', frutaRoutes);
+
+
+app.use("/public/depto", express.static(path.join(__dirname, "../public/images_android/depto")));
+app.use("/public/fruta", express.static(path.join(__dirname, "../public/images_android/Fruta")));
+
+
+const port = 3020;
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Servidor backend corriendo en http://localhost:${port}`);
 });
 
-app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
-});

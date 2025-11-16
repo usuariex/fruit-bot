@@ -17,7 +17,11 @@
 
     <item
         android:id="@+id/profileFragment"
-        
+
         android:title="Profile" />
+    <item
+        android:id="@+id/loginFragment"
+
+        android:title="Login" />
 
 </menu>
