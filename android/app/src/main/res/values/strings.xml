@@ -7,4 +7,6 @@
     <string name="previous">Previous</string>
     <string name="register_text">
         No estás registrado? <a href="register">Regístrate aquí</a></string>
+
+    <string name="department_image">Department image</string>
 </resources>
