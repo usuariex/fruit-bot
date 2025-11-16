@@ -25,7 +25,7 @@ public class LoginFragment extends Fragment {
     Button btnLoginConfirm, btnBack;
 
     public LoginFragment() {
-        // Constructor vacío obligatorio
+
     }
 
     @Nullable
@@ -40,19 +40,19 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // --- Texto de registro ---
+
         TextView tvRegister = view.findViewById(R.id.tvRegister);
         tvRegister.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
         tvRegister.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         tvRegister.setTypeface(tvRegister.getTypeface(), Typeface.BOLD);
 
         tvRegister.setOnClickListener(v -> {
-            // Navegar al fragment de registro
+
             Navigation.findNavController(view)
                     .navigate(R.id.action_loginFragment_to_registerFragment);
         });
 
-        // --- Campos y botones ---
+
         etUsername = view.findViewById(R.id.etUsername);
         etPassword = view.findViewById(R.id.etPassword);
         btnLoginConfirm = view.findViewById(R.id.btnLoginConfirm);

@@ -97,7 +97,7 @@ public class ScannerFragment extends Fragment {
                 cameraProvider.unbindAll();
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
             } catch (Exception e) {
-                Toast.makeText(requireContext(), "Error starting camera", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error al inicar la camera", Toast.LENGTH_SHORT).show();
             }
         }, ContextCompat.getMainExecutor(requireContext()));
     }
@@ -124,7 +124,7 @@ public class ScannerFragment extends Fragment {
 
                         Toast.makeText(
                                 requireContext(),
-                                "Your request was sent. The response will be available soon.",
+                                "Su solicitud esta siendo porcesada. Notificaremos la respuesta..",
                                 Toast.LENGTH_LONG
                         ).show();
 
@@ -137,7 +137,7 @@ public class ScannerFragment extends Fragment {
                     public void onError(@NonNull ImageCaptureException exception) {
                         Toast.makeText(
                                 requireContext(),
-                                "Error taking photo: " + exception.getMessage(),
+                                "Error al tomar la foto: " + exception.getMessage(),
                                 Toast.LENGTH_SHORT
                         ).show();
                     }

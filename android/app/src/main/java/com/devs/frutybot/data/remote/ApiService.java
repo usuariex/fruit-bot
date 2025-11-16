@@ -15,13 +15,13 @@ import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiService {
-    // GET http://10.0.2.2:3020/frutas/depto?depto=junin
+
 
     @GET("frutas/depto")
     Call<List<FruitDto>> getFruitsByDepartment(@Query("depto") String departamento);
 
     @Multipart
-    @POST("fruits/upload")
+    @POST("frutas/subirImg")
     Call<ResponseBody> uploadFruitImage(
             @Part MultipartBody.Part file,
             @Part("text") RequestBody text

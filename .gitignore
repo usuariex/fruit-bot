@@ -63,3 +63,7 @@ yarn-error.log*
 ehthumbs.db
 Icon?
 Desktop.ini
+
+# carpeta vacia temp/
+backend/public/images_android/temp/*
+!backend/public/images_android/temp/
