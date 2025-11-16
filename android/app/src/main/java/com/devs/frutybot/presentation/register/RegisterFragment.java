@@ -48,7 +48,7 @@ public class RegisterFragment extends Fragment {
                 Toast.makeText(requireContext(), "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(requireContext(), "¡Registro exitoso!", Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(v).popBackStack(); // vuelve al login
+                Navigation.findNavController(v).popBackStack();
             }
         });
 
