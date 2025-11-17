@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar WebSocket global
         wsManager = new WsManager();
-        wsManager.connect("ws://192.168.100.229:3020/ws");
+        wsManager.connect("ws://192.168.100.176:3020/ws");
 
         // Referencia al Toolbar superior
         MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
