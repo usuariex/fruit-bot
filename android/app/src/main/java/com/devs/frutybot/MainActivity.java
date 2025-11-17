@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+import com.devs.frutybot.data.local.UserSession;
 
 import com.devs.frutybot.data.ws.WsManager;
 import com.devs.frutybot.presentation.notifications.NotificationsDialogFragment;
@@ -67,26 +68,26 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
-        NavigationUI.setupWithNavController(bottomNav, navController);
+        UserSession session = new UserSession(this);
 
+        bottomNav.setOnItemSelectedListener(item -> {
 
+            if (item.getItemId() == R.id.profileFragment) {
 
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                if (session.isLoggedIn()) {
+                    navController.navigate(R.id.profileFragment);
+                } else {
+                    navController.navigate(R.id.loginFragment);
+                }
 
-            int destId = destination.getId();
-
-            if (destId == R.id.loginFragment
-                    || destId == R.id.registerFragment
-                    || destId == R.id.splashFragment) {
-
-                toolbar.setVisibility(View.GONE);
-
-            } else {
-
-                toolbar.setVisibility(View.VISIBLE);
-                bottomNav.setVisibility(View.VISIBLE);
+                return true;
             }
+
+            return NavigationUI.onNavDestinationSelected(item, navController)
+                    || super.onOptionsItemSelected(item);
         });
+
+        NavigationUI.setupWithNavController(bottomNav, navController);
     }
 
     public WsManager getWsManager() {
