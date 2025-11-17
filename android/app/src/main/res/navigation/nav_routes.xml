@@ -1,5 +1,6 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
@@ -59,5 +60,24 @@
         android:id="@+id/registerFragment"
         android:name="com.devs.frutybot.presentation.register.RegisterFragment"
         android:label="Register"/>
+
+
+    <fragment
+        android:id="@+id/requestDetailFragment"
+        android:name="com.devs.frutybot.presentation.notifications.RequestDetailFragment"
+        android:label="Detalle"
+        tools:layout="@layout/fragment_request_detail">
+        <argument
+            android:name="requestId"
+            app:argType="string" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.devs.frutybot.presentation.splash.SplashFragment"
+        android:label="splash">
+    </fragment>
+
 
 </navigation>

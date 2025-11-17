@@ -1,10 +1,14 @@
 package com.devs.frutybot.presentation.scanner;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -23,8 +27,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.devs.frutybot.MainActivity;
+import com.devs.frutybot.NotificationsViewModel;
 import com.devs.frutybot.R;
+import com.devs.frutybot.data.dto.RequestItemDto;
+import com.devs.frutybot.data.util.RepositoryCallback;
+import com.devs.frutybot.data.ws.WsManager;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -34,6 +47,7 @@ public class ScannerFragment extends Fragment {
     private ImageCapture imageCapture;
     private ScannerViewModel viewModel;
     private EditText inputText;
+    private NotificationsViewModel notificationsViewModel;
 
     public ScannerFragment() {
         super(R.layout.fragment_scanner);
@@ -47,11 +61,73 @@ public class ScannerFragment extends Fragment {
         inputText = view.findViewById(R.id.inputText);
         Button btnUpload = view.findViewById(R.id.btnUpload);
 
-        viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
+        // ViewModel compartido para notificaciones
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
-        viewModel.getFruitInfo().observe(getViewLifecycleOwner(), result -> {
-            Toast.makeText(requireContext(), "Result: " + result, Toast.LENGTH_LONG).show();
+        // ViewModel propio del scanner
+        viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
+        viewModel.getFruitInfo().observe(getViewLifecycleOwner(), requestId -> {
+            if (requestId != null && !requestId.startsWith("Error")) {
+                // Guardar solicitud en lista
+                RequestItemDto item = new RequestItemDto(requestId, "Procesando", /* aquí puedes guardar la ruta de la foto */ null);
+                notificationsViewModel.addRequest(item);
+
+                // Suscribirse al WebSocket
+                WsManager wsManager = ((MainActivity) requireActivity()).getWsManager();
+                wsManager.subscribe(requestId, new WsManager.WsCallback() {
+                    @Override
+                    public void onResult(String requestId, String json) {
+                        try {
+                            JSONObject obj = new JSONObject(json);
+                            JSONObject result = obj.getJSONObject("result");
+                            String fruta = result.getString("fruta");
+                            String departamento = result.getString("departamento");
+
+                            notificationsViewModel.updateRequest(requestId, "Listo", fruta, departamento);
+                        } catch (JSONException e) {
+                            notificationsViewModel.updateRequest(requestId, "Error", null, null);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String requestId, String error) {
+                        notificationsViewModel.updateRequest(requestId, "Error", null, null);
+                    }
+                });
+            } else {
+                Toast.makeText(requireContext(), requestId, Toast.LENGTH_SHORT).show();
+            }
         });
+
+
+
+
+
+        TextView hintText = view.findViewById(R.id.hintText);
+        TextInputLayout textInputLayout = view.findViewById(R.id.textInputLayout);
+
+        hintText.setOnClickListener(v -> {
+            // Ocultar el texto inicial
+            hintText.setVisibility(View.GONE);
+            // Mostrar el campo de texto
+            textInputLayout.setVisibility(View.VISIBLE);
+            // Dar foco al input
+            if (textInputLayout.getEditText() != null) {
+                textInputLayout.getEditText().requestFocus();
+
+                // Abrir teclado automáticamente
+                InputMethodManager imm = (InputMethodManager) requireContext()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(textInputLayout.getEditText(), InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+
+
+
+
+
+
+
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -65,14 +141,16 @@ public class ScannerFragment extends Fragment {
 
 
 
+
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     startCamera();
                 } else {
-                    Toast.makeText(requireContext(), "El permiso de la camara es necesario", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "El permiso de la cámara es necesario", Toast.LENGTH_SHORT).show();
                 }
             });
+
 
 
 
@@ -97,14 +175,10 @@ public class ScannerFragment extends Fragment {
                 cameraProvider.unbindAll();
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
             } catch (Exception e) {
-                Toast.makeText(requireContext(), "Error al inicar la camera", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error al iniciar la cámara", Toast.LENGTH_SHORT).show();
             }
         }, ContextCompat.getMainExecutor(requireContext()));
     }
-
-
-
-
 
     private void takePhoto() {
         File photoFile = new File(requireContext().getCacheDir(), "capture.jpg");
@@ -120,17 +194,20 @@ public class ScannerFragment extends Fragment {
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                         String text = inputText.getText().toString().trim();
 
+
                         viewModel.uploadFruit(photoFile, text);
 
-                        Toast.makeText(
-                                requireContext(),
-                                "Su solicitud esta siendo porcesada. Notificaremos la respuesta..",
-                                Toast.LENGTH_LONG
-                        ).show();
-
-                        NavController navController =
-                                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-                        navController.navigate(R.id.homeFragment);
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle("Solicitud enviada")
+                                .setMessage("Su solicitud está siendo procesada. Revisa la campanita.")
+                                .setPositiveButton("Aceptar", (dialog, which) -> {
+                                    dialog.dismiss();
+                                    // Navegar al HomeFragment cuando el usuario cierre el diálogo
+                                    NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+                                    navController.navigate(R.id.homeFragment);
+                                })
+                                .setCancelable(false)
+                                .show();
                     }
 
                     @Override
@@ -144,4 +221,5 @@ public class ScannerFragment extends Fragment {
                 }
         );
     }
+
 }

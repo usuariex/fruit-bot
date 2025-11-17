@@ -1,11 +1,15 @@
 package com.devs.frutybot.data.repository;
 
+import com.devs.frutybot.data.dto.UploadResponse;
 import com.devs.frutybot.data.remote.ApiClient;
 import com.devs.frutybot.data.remote.ApiService;
 import com.devs.frutybot.data.dto.FruitDto;
 import com.devs.frutybot.data.mapper.FruitMapper;
 import com.devs.frutybot.data.util.RepositoryCallback;
 import com.devs.frutybot.domain.model.Fruit;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,31 +58,26 @@ public class FruitRepository {
                 text
         );
 
-        apiService.uploadFruitImage(body, textBody).enqueue(new Callback<ResponseBody>() {
-
+        apiService.uploadFruitImage(body, textBody).enqueue(new Callback<UploadResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    try (ResponseBody body = response.body()) {
-                        if (body != null) {
-                            String result = body.string();
-                            callback.onSuccess(result);
-                        }
-                    } catch (IOException e) {
-                        callback.onError(e);
-                    }
+                    String requestId = response.body().getRequestId();
+                    callback.onSuccess(requestId);
+
+
                 } else {
-                    callback.onError(new Throwable("Error in response: " + response.code()));
+                    callback.onError(new Throwable("Error en la respuesta: " + response.code()));
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
                 callback.onError(t);
             }
-
         });
     }
+
 
 
 }
