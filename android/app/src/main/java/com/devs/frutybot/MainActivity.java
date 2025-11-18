@@ -1,31 +1,96 @@
 package com.devs.frutybot;
 
 import android.os.Bundle;
+import android.view.View;
 
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+import com.devs.frutybot.data.local.UserSession;
 
+import com.devs.frutybot.data.ws.WsManager;
+import com.devs.frutybot.presentation.notifications.NotificationsDialogFragment;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
+    private WsManager wsManager;
 
-
+    @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
+        // Inicializar WebSocket global
+        wsManager = new WsManager();
+        wsManager.connect("ws://192.168.100.176:3020/ws");
 
+        // Referencia al Toolbar superior
+        MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
+
+        // Listener para clicks en el menú del Toolbar
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_notifications) {
+                NotificationsDialogFragment dialog = new NotificationsDialogFragment();
+                dialog.show(getSupportFragmentManager(), "NotificationsDialog");
+                return true;
+            }
+            return false;
+        });
+
+
+        // ViewModel compartido para notificaciones
+        NotificationsViewModel notificationsViewModel =
+                new ViewModelProvider(this).get(NotificationsViewModel.class);
+
+        // Observar solicitudes y actualizar badge en la campanita
+        notificationsViewModel.getRequests().observe(this, requests -> {
+            BadgeDrawable badge = BadgeDrawable.create(this);
+            badge.setNumber(requests.size());
+            badge.setVisible(true);
+
+            // Adjuntar badge al ítem de la campanita del Toolbar
+            BadgeUtils.attachBadgeDrawable(badge, toolbar, R.id.action_notifications);
+        });
+
+        // Configurar navegación inferior
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
+        UserSession session = new UserSession(this);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+
+            if (item.getItemId() == R.id.profileFragment) {
+
+                if (session.isLoggedIn()) {
+                    navController.navigate(R.id.profileFragment);
+                } else {
+                    navController.navigate(R.id.loginFragment);
+                }
+
+                return true;
+            }
+
+            return NavigationUI.onNavDestinationSelected(item, navController)
+                    || super.onOptionsItemSelected(item);
+        });
 
         NavigationUI.setupWithNavController(bottomNav, navController);
+    }
+
+    public WsManager getWsManager() {
+        return wsManager;
     }
 }

@@ -1,52 +1,34 @@
 import { conexionbd } from "../db.js";
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { v4 as uuidv4 } from "uuid";
+import { detectarFrutaConIA } from "../services/api_detector_ia.js";
+//import { notifyResult } from "../websocket/wsServer.js";
 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+export const recibirImg = async (req, res) => {
+  try {
+    const { text } = req.body;
+    const file = req.file;
 
-
-
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../../public/images_android/temp"));
-  },
-  filename: (req, file, cb) => {
-    /* const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName); */
-
-     cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage });
-
- /* subir fruta */
-export const uploadFruit = [
-  upload.single("file"), 
-  async (req, res) => {
-    try {
-      const text = req.body.text;
-      const file = req.file;
-
-      if (!file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
-
-      res.json({
-        message: "Upload successful",
-        textReceived: text,
-        filePath: `/public/images_android/temp/${file.filename}`,
-      });
-    } catch (err) {
-      res.status(500).json({ error: "Server error", details: err.message });
+    if (!file) {
+      return res.status(400).json({ error: "Imagen no subida" });
     }
-  },
-];
+
+    const requestId = uuidv4();
+      
+    detectarFrutaConIA(file.path, text)
+      .then(resultado => {
+        notifyResult(requestId, resultado);
+      })
+      .catch(err => {
+        notifyResult(requestId, { error: err.message });
+      }); 
+
+
+    res.json({ message: "imagen recibida, procesando", requestId });
+  } catch (err) {
+    res.status(500).json({ error: "Error del serividor", details: err.message });
+  }
+};
 
 
 

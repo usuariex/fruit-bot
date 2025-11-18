@@ -1,7 +1,8 @@
-const { OpenAI } = require('openai');
-const dotenv = require('dotenv');
-const fs = require('fs');
-const path = require('path');
+import OpenAI from "openai";
+import dotenv from "dotenv";
+import { z } from "zod";
+import { zodResponseFormat } from "openai/helpers/zod";
+import fs from "fs";
 
 dotenv.config();
 
@@ -10,51 +11,84 @@ const modelo = process.env.MODEL;
 
 const client = new OpenAI({ apiKey: apiKey });
 
-const pregunta = "¿Que fruta es la que se muestra en la imagen?";
+//const pregunta = "¿Que fruta es la que se muestra en la imagen?";
+//const imagen = "manzanaIsrael1.jpg";
+//const pista = "";
 
-const imagen = path.join(__dirname, '..', '..', 'public', 'images', 'lucuma2.jpg');
-const pista = "lucm";
+// La llamada a la API de OpenAI ha sido movida a una función exportable.
+// El código original se convierte a un servicio.
 
 
-async function detectarFruta() {
-    const imagen_convertida = fs.readFileSync(imagen, "base64");
+// Esquema con Zod 
+const ModeloDelJSON = z.object({
+    nombre: z.string(),
+    pais: z.string(),
+    departamento: z.string(),
+    descripcion: z.string(),
+    proceso_de_maduracion: z.string(),
+    informacion_nutricional: z.string(),
+    calorias: z.string(),
+    vitaminas: z.array(z.string()), 
+    fibra: z.string(),
+    azucares: z.string(),
+    temporada: z.string(),
+    tipo: z.string(),
+    valida: z.string(),
+});
 
+function img_to_base64(imagenPath) {
+    const contenido_img = fs.readFileSync(imagenPath);
+    return contenido_img.toString("base64");
+}
+
+export const detectarFrutaConIA = async (imagePath, pista) => {
+    const pregunta = "¿Que fruta es la que se muestra en la imagen?";
+    const imagen_convertida = img_to_base64(imagePath);
+
+    // Creo el diccionario dinámico del contenido para el rol "user"
     const lista_user_dinamica = [
         {
-            "type": "input_text",
-            "text": pregunta
+            type: "text",
+            text: pregunta
         }
     ];
 
-    if (pista && pista.trim()) {
-        lista_user_dinamica.push({ "type": "input_text", "text": pista });
+    // Se verifica si existe ayuda (pista), se agrega al diccionario
+    if (pista && pista.trim().length > 0) {
+        lista_user_dinamica.push({ type: "text", text: `Pista: ${pista}` });
     }
 
+    // Por último agrego la lista para mandar la imagen al diccionario
     lista_user_dinamica.push({
-        "type": "input_image",
-        "image_url": `data:image/jpg;base64,${imagen_convertida}`,
-        "detail": "high"
+        type: "image_url",
+        image_url: {
+            url: `data:image/jpeg;base64,${imagen_convertida}`,
+            detail: "high"
+        }
     });
 
-    const response = await client.responses.create({
+    // Se usa la instancia 'client' que contiene tu API Key para hacer la llamada.
+    // Se mantiene tu estructura con .responses.parse
+    const response = await client.responses.parse({
         model: modelo,
         input: [
             {
-                "role": "developer",
-                "content": "Responde SIEMPRE en formato JSON, sin texto adicional. Debes tomar como prioridad las frutas que se producen en el perú como primera opcion a respuesta, despues de verificar que no sea una fruta originaria del peru puedes ver si es originaria de otra parte del mundo. Debes mantener EXACTAMENTE el siguiente orden de claves y estructura:\n\n{\n  \"nombre\": \"(nombre de la fruta, deberás ser especifico con el nombre tal como: palta hass, manzana israel, manzana pachacamac, etc. No nombres cientificos. No tildes)\",\n  \"departamento\": \"(aquí deberás darme como prioridad unicamente un departamento del perú en el que es más producida y del cual es originaria la fruta tal como la libertad, loreto, amazonas, ancash, ica, etc. Y si la fruta no es originaria del peru, colocarás su departamento del que es originario y el pais de origen en ese orden)\",\n  \"descripcion\": {\n    \"proceso_de_maduracion\": \"(describe cómo madura la fruta)\",\n    \"informacion_nutricional\": {\n      \"calorias\": (número entero o decimal),\n      \"vitamina_c_mg\": (número decimal en mg),\n      \"fibra_g\": (número decimal en g),\n      \"azucares_g\": (número decimal en g)\n    },\n    \"temporada\": \"(meses de cosecha)\",\n    \"tipo\": \"(tipo de fruta: tropical, cítrica, etc.)\"\n  },\n  \"valida\": true\n}\n\nReglas adicionales:\n1. No incluyas texto fuera del JSON.\n2. Usa siempre comillas dobles para las claves y valores de texto.\n3. Respeta el orden de las claves exactamente como se muestra.\n4. 'valida' debe ser un valor booleano (true o false) que indique si la fruta cumple estándares para publicarse en una app. Además si el usuario despues de mandar la pregunta te envia un nombre de algo, tomalo como una posible sugerencia de lo que podria ser lo que se encuentra en la imagen."
+                role: "developer",
+                content: "Debes tomar como prioridad las frutas que se producen en el perú como primera opcion a respuesta, despues de verificar puedes ver si es originaria de otra parte del mundo. Debes mantener EXACTAMENTE las siguientes instrucciones para tus respuestas: nombre(nombre de la fruta, deberás ser especifico con el nombre tal como:  manzana israel, etc. No nombres cientificos. No tildes), pais(Colocaras el pais de origen de la fruta), proceso_de_maduracion(describe cómo madura la fruta), departamento(deberás darme como prioridad unicamente un departamento del perú en el que es más producida y de el cual es originaria tal como la libertad, loreto, amazonas, ancash, ica, etc.), temporada(meses de cosecha), tipo(tipo de fruta: tropical, cítrica, etc.), valida(Puede ser True o False, representa si la imagen cumple con estandares de UX para publicarse). Reglas adicionales:\n1. Respeta el orden de las claves exactamente como se muestra. Además si el usuario despues de mandar la pregunta te envia un nombre de algo, tomalo como una posible sugerencia de lo que podria ser lo que se encuentra en la imagen."
             },
             {
-                "role": "user",
-                "content": lista_user_dinamica,
-            },
-        ]
+                role: "user",
+                content: lista_user_dinamica
+            }
+        ],
+        response_format: zodResponseFormat(ModeloDelJSON, "datos_fruta"),
     });
 
-    const respuesta_api = response.output_text;
-    const informacion_json = JSON.parse(respuesta_api);
+    // Borramos la imagen temporal después de procesarla
+    fs.unlink(imagePath, (err) => {
+        if (err) console.error("Error al borrar imagen temporal:", err);
+    });
 
-    console.log(informacion_json);
-    console.log(informacion_json["departamento"]);
-}
-
-detectarFruta();
+    // La respuesta ya viene parseada y validada por zodResponseFormat
+    return response;
+};
