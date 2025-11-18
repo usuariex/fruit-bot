@@ -17,11 +17,6 @@
         android:label="Scanner"/>
 
     <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.devs.frutybot.presentation.profile.ProfileFragment"
-        android:label="Profile"/>
-
-    <fragment
         android:id="@+id/homeFragment"
         android:name="com.devs.frutybot.presentation.home.HomeFragment"
         android:label="Home">
@@ -52,6 +47,9 @@
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
 
     </fragment>
 
@@ -60,6 +58,13 @@
         android:id="@+id/registerFragment"
         android:name="com.devs.frutybot.presentation.register.RegisterFragment"
         android:label="Register"/>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.devs.frutybot.presentation.profile.ProfileFragment"
+        android:label="Perfil" />
+    <action
+        android:id="@+id/action_profileFragment_to_loginFragment"
+        app:destination="@id/loginFragment" />
 
 
     <fragment

@@ -3,7 +3,7 @@ import mysql from 'mysql2';
 const con = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'mysql_mysql',
+  password: '',
   database: 'db_frutas',
 });
 

@@ -11,9 +11,13 @@ const modelo = process.env.MODEL;
 
 const client = new OpenAI({ apiKey: apiKey });
 
-const pregunta = "¿Que fruta es la que se muestra en la imagen?";
-const imagen = "manzanaIsrael1.jpg";
-const pista = "";
+//const pregunta = "¿Que fruta es la que se muestra en la imagen?";
+//const imagen = "manzanaIsrael1.jpg";
+//const pista = "";
+
+// La llamada a la API de OpenAI ha sido movida a una función exportable.
+// El código original se convierte a un servicio.
+
 
 // Esquema con Zod 
 const ModeloDelJSON = z.object({
@@ -37,32 +41,35 @@ function img_to_base64(imagenPath) {
     return contenido_img.toString("base64");
 }
 
-const imagen_convertida = img_to_base64(imagen);
+export const detectarFrutaConIA = async (imagePath, pista) => {
+    const pregunta = "¿Que fruta es la que se muestra en la imagen?";
+    const imagen_convertida = img_to_base64(imagePath);
 
-// Creo el diccionario dinámico del contenido para el rol "user"
-const lista_user_dinamica = [
-    {
-        type: "text",
-        text: pregunta
+    // Creo el diccionario dinámico del contenido para el rol "user"
+    const lista_user_dinamica = [
+        {
+            type: "text",
+            text: pregunta
+        }
+    ];
+
+    // Se verifica si existe ayuda (pista), se agrega al diccionario
+    if (pista && pista.trim().length > 0) {
+        lista_user_dinamica.push({ type: "text", text: `Pista: ${pista}` });
     }
-];
 
-// Se verifica si existe ayuda (pista), se agrega al diccionario
-if (pista && pista.trim().length > 0) {
-    lista_user_dinamica.push({ type: "text", text: pista });
-}
+    // Por último agrego la lista para mandar la imagen al diccionario
+    lista_user_dinamica.push({
+        type: "image_url",
+        image_url: {
+            url: `data:image/jpeg;base64,${imagen_convertida}`,
+            detail: "high"
+        }
+    });
 
-// Por último agrego la lista para mandar la imagen al diccionario
-lista_user_dinamica.push({
-    type: "image_url",
-    image_url: {
-        url: `data:image/jpg;base64,${imagen_convertida}`,
-        detail: "high"
-    }
-});
-
-async function main() {
-    const response = await OpenAI.responses.parse({
+    // Se usa la instancia 'client' que contiene tu API Key para hacer la llamada.
+    // Se mantiene tu estructura con .responses.parse
+    const response = await client.responses.parse({
         model: modelo,
         input: [
             {
@@ -74,13 +81,14 @@ async function main() {
                 content: lista_user_dinamica
             }
         ],
-        response_format: zodResponseFormat(ModeloDelJSON, "fruit_analysis"),
+        response_format: zodResponseFormat(ModeloDelJSON, "datos_fruta"),
     });
 
-    const informacion_json = response.choices[0].message.parsed;
+    // Borramos la imagen temporal después de procesarla
+    fs.unlink(imagePath, (err) => {
+        if (err) console.error("Error al borrar imagen temporal:", err);
+    });
 
-    console.log(informacion_json);
-    console.log(informacion_json.departamento);
-}
-
-main();
+    // La respuesta ya viene parseada y validada por zodResponseFormat
+    return response;
+};

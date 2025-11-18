@@ -20,7 +20,7 @@ public interface ApiService {
     Call<List<FruitDto>> getFruitsByDepartment(@Query("depto") String departamento);
 
     @Multipart
-    @POST("frutas/subirImg")
+    @POST("frutas/recibirImg")
     Call<UploadResponse> uploadFruitImage(
             @Part MultipartBody.Part file,
             @Part("text") RequestBody text
