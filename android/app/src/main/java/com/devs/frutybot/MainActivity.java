@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        androidx.core.splashscreen.SplashScreen splashScreen =
+                androidx.core.splashscreen.SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -87,10 +89,12 @@ public class MainActivity extends AppCompatActivity {
                     || super.onOptionsItemSelected(item);
         });
 
+
         NavigationUI.setupWithNavController(bottomNav, navController);
     }
 
     public WsManager getWsManager() {
         return wsManager;
     }
+
 }
