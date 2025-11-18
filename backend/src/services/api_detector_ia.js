@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import dotenv from "dotenv";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from "fs";
 
 dotenv.config();
@@ -48,27 +49,35 @@ export const detectarFrutaConIA = async (imagePath, pista) => {
     // Creo el diccionario dinámico del contenido para el rol "user"
     const lista_user_dinamica = [
         {
-            type: "text",
+            type: "input_text",
             text: pregunta
         }
     ];
 
     // Se verifica si existe ayuda (pista), se agrega al diccionario
     if (pista && pista.trim().length > 0) {
-        lista_user_dinamica.push({ type: "text", text: `Pista: ${pista}` });
+        lista_user_dinamica.push({ type: "input_text", text: `Pista: ${pista}` });
     }
 
     // Por último agrego la lista para mandar la imagen al diccionario
     lista_user_dinamica.push({
-        type: "image_url",
-        image_url: {
-            url: `data:image/jpeg;base64,${imagen_convertida}`,
-            detail: "high"
-        }
+        type: "input_image",
+        image_url: `data:image/jpeg;base64,${imagen_convertida}`
     });
 
-    // Se usa la instancia 'client' que contiene tu API Key para hacer la llamada.
-    // Se mantiene tu estructura con .responses.parse
+    const schemaGenerado = zodToJsonSchema(ModeloDelJSON, "datos_fruta");
+
+    let schemaJSON = schemaGenerado;
+
+    if (schemaGenerado.definitions?.datos_fruta) {
+        schemaJSON = schemaGenerado.definitions.datos_fruta;
+    }
+
+    if (schemaGenerado.datos_fruta) {
+        schemaJSON = schemaGenerado.datos_fruta;
+    }
+
+
     const response = await client.responses.parse({
         model: modelo,
         input: [
@@ -81,13 +90,20 @@ export const detectarFrutaConIA = async (imagePath, pista) => {
                 content: lista_user_dinamica
             }
         ],
-        response_format: zodResponseFormat(ModeloDelJSON, "datos_fruta"),
+        text: {
+        format: {
+            type: "json_schema",
+            name: "datos_fruta",
+            schema: schemaJSON, 
+            strict: true
+        }
+    }
     });
 
     // Borramos la imagen temporal después de procesarla
-    fs.unlink(imagePath, (err) => {
+/*     fs.unlink(imagePath, (err) => {
         if (err) console.error("Error al borrar imagen temporal:", err);
-    });
+    }); */
 
     // La respuesta ya viene parseada y validada por zodResponseFormat
     return response;

@@ -19,8 +19,9 @@
     "multer": "^2.0.2",
     "mysql2": "^3.15.3",
     "openai": "^4.104.0",
+    "uuid": "^13.0.0",
     "zod": "^3.25.76",
-    "uuid": "^13.0.0"
+    "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
