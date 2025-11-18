@@ -14,15 +14,14 @@ export const recibirImg = async (req, res) => {
     }
 
     const requestId = uuidv4();
-
       
-   /*  detectarFruta(file.path, text)
+    detectarFrutaConIA(file.path, text)
       .then(resultado => {
         notifyResult(requestId, resultado);
       })
       .catch(err => {
         notifyResult(requestId, { error: err.message });
-      }); */
+      }); 
 
 
     res.json({ message: "imagen recibida, procesando", requestId });
