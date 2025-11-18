@@ -1,10 +1,10 @@
 import { conexionbd } from "../db.js";
 import { v4 as uuidv4 } from "uuid";
-/* import { detectarFruta } from "../services/detectarFruta.js";
-import { notifyResult } from "../websocket/wsServer.js"; */
+import { detectarFrutaConIA } from "../services/api_detector_ia.js";
+//import { notifyResult } from "../websocket/wsServer.js";
 
 
-export const subirImg = async (req, res) => {
+export const recibirImg = async (req, res) => {
   try {
     const { text } = req.body;
     const file = req.file;
