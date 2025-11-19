@@ -1,17 +1,15 @@
 import { conexionbd } from "../db.js";
 
-async function guardarResultBD(resultado) {
+
+export async function guardarResultBD(resultado) {
   try {
     await conexionbd.query(
-      "INSERT INTO resultados_ia (id, status, model, schema, tokens, output_text, fruit, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+      "INSERT INTO tokens (id, input, output, total, created_at) VALUES (?, ?, ?, ?, NOW())",
       [
         resultado.id,
-        resultado.status,
-        resultado.model,
-        JSON.stringify(resultado.schema),
-        JSON.stringify(resultado.tokens),
-        resultado.output_text,
-        JSON.stringify(resultado.fruit)
+        resultado.tokens.input,
+        resultado.tokens.output,
+        resultado.tokens.total
       ]
     );
     console.log("Resultado guardado en BD:", resultado.id);

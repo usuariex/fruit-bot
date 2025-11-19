@@ -2,7 +2,7 @@ import { conexionbd } from "../db.js";
 import { v4 as uuidv4 } from "uuid";
 import { detectarFrutaConIA } from "../services/api_detector_ia.js";
 import { config } from "../config.js";
-/* import { guardarResultBD } from "../repository/frutaRepo.js"; */
+import { guardarResultBD } from "../repository/frutaRepo.js"; 
 import { notifyResult } from "../index.js";
 
 
@@ -36,7 +36,7 @@ export const recibirImg = async (req, res) => {
           status: "done",
           fruit: resultado.fruit
         });
-        /* guardarResultBD(resultado); */
+        guardarResultBD(resultado);
       })
 
 
