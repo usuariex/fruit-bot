@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.devs.frutybot.R;
+import com.devs.frutybot.common.Config;
 import com.devs.frutybot.domain.model.Department;
 import com.devs.frutybot.presentation.adapters.DepartmentAdapter;
 
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerDepartments;
-
+    private String mi_ip_local = Config.BASE_URL;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -31,31 +32,31 @@ public class HomeFragment extends Fragment {
         recyclerDepartments = view.findViewById(R.id.recyclerDepartments);
 
         List<Department> list = Arrays.asList(
-                new Department("Amazonas", "http://192.168.100.176:3020/public/depto/Amazonas.jpg"),
-                new Department("Áncash", "http://192.168.100.176:3020/public/depto/Ancash.jpg"),
-                new Department("Apurimac", "http://192.168.100.176:3020/public/depto/Apurimac.jpg"),
-                new Department("Arequipa", "http://192.168.100.176:3020/public/depto/Arequipa.jpg"),
-                new Department("Ayacucho", "http://192.168.100.176:3020/public/depto/Ayacucho.jpg"),
-                new Department("Cajamarca", "http://192.168.100.176:3020/public/depto/Cajamarca.jpg"),
-                new Department("Callao", "http://192.168.100.176:3020/public/depto/Callao.jpg"),
-                new Department("Cusco", "http://192.168.100.176:3020/public/depto/Cusco.jpg"),
-                new Department("Huancavelica", "http://192.168.100.176:3020/public/depto/Huancavelica.jpg"),
-                new Department("Huánuco", "http://192.168.100.176:3020/public/depto/Huanuco.jpg"),
-                new Department("Ica", "http://192.168.100.176:3020/public/depto/Ica.jpg"),
-                new Department("Junin", "http://192.168.100.176:3020/public/depto/Junin.jpg"),
-                new Department("La Libertad", "http://192.168.100.176:3020/public/depto/lalibertad.jpg"),
-                new Department("Lambayeque", "http://192.168.100.176:3020/public/depto/Lambayeque.jpg"),
-                new Department("Lima", "http://192.168.100.176:3020/public/depto/Lima.jpg"),
-                new Department("Loreto", "http://192.168.100.176:3020/public/depto/Loreto.jpg"),
-                new Department("Madre de Dios", "http://192.168.100.176:3020/public/depto/MadredeDios.jpg"),
-                new Department("Moquegua", "http://192.168.100.176:3020/public/depto/Moquegua.jpg"),
-                new Department("Pasco", "http://192.168.100.176:3020/public/depto/Pasco.jpg"),
-                new Department("Piura", "http://192.168.100.176:3020/public/depto/Piura.jpg"),
-                new Department("Puno", "http://192.168.100.176:3020/public/depto/Puno.jpg"),
-                new Department("San Martin", "http://192.168.100.176:3020/public/depto/SanMartin.jpg"),
-                new Department("Tacna", "http://192.168.100.176:3020/public/depto/Tacna.jpg"),
-                new Department("Tumbes", "http://192.168.100.176:3020/public/depto/Tumbes.jpg"),
-                new Department("Ucayali", "http://192.168.100.176:3020/public/depto/Ucayali.jpg")
+                new Department("Amazonas", mi_ip_local + "/public/depto/Amazonas.jpg"),
+                new Department("Áncash", mi_ip_local + "/public/depto/Ancash.jpg"),
+                new Department("Apurimac", mi_ip_local + "/public/depto/Apurimac.jpg"),
+                new Department("Arequipa", mi_ip_local + "/public/depto/Arequipa.jpg"),
+                new Department("Ayacucho", mi_ip_local + "/public/depto/Ayacucho.jpg"),
+                new Department("Cajamarca", mi_ip_local + "/public/depto/Cajamarca.jpg"),
+                new Department("Callao", mi_ip_local + "/public/depto/Callao.jpg"),
+                new Department("Cusco", mi_ip_local + "/public/depto/Cusco.jpg"),
+                new Department("Huancavelica", mi_ip_local + "/public/depto/Huancavelica.jpg"),
+                new Department("Huánuco", mi_ip_local + "/public/depto/Huanuco.jpg"),
+                new Department("Ica", mi_ip_local + "/public/depto/Ica.jpg"),
+                new Department("Junin", mi_ip_local + "/public/depto/Junin.jpg"),
+                new Department("La Libertad", mi_ip_local + "/public/depto/lalibertad.jpg"),
+                new Department("Lambayeque", mi_ip_local + "/public/depto/Lambayeque.jpg"),
+                new Department("Lima", mi_ip_local + "/public/depto/lima.jpg"),
+                new Department("Loreto", mi_ip_local + "/public/depto/Loreto.jpg"),
+                new Department("Madre de Dios", mi_ip_local + "/public/depto/MadredeDios.jpg"),
+                new Department("Moquegua", mi_ip_local + "/public/depto/Moquegua.jpg"),
+                new Department("Pasco", mi_ip_local + "/public/depto/Pasco.jpg"),
+                new Department("Piura", mi_ip_local + "/public/depto/Piura.jpg"),
+                new Department("Puno", mi_ip_local + "/public/depto/Puno.jpg"),
+                new Department("San Martin", mi_ip_local + "/public/depto/SanMartin.jpg"),
+                new Department("Tacna", mi_ip_local + "/public/depto/Tacna.jpg"),
+                new Department("Tumbes", mi_ip_local + "/public/depto/Tumbes.jpg"),
+                new Department("Ucayali", mi_ip_local + "/public/depto/Ucayali.jpg")
 
         );
 

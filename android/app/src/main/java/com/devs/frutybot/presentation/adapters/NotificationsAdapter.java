@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.devs.frutybot.R;
 import com.devs.frutybot.data.dto.RequestItemDto;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         }
 
         void bind(RequestItemDto item, NavController navController) {
-            txtStatus.setText(item.getStatus());
+            if (item.getFruit() != null) {
+                txtStatus.setText(item.getStatus() + " - " + item.getFruit().getNombre());
+            } else {
+                txtStatus.setText(item.getStatus());
+            }
 
             if (item.getPhotoPath() != null) {
                 imgPhoto.setImageURI(Uri.parse(item.getPhotoPath()));
@@ -75,10 +80,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             itemView.setOnClickListener(v -> {
                 Bundle args = new Bundle();
                 args.putString("requestId", item.getRequestId());
+                // Aquí también podrías pasar el FruitDto completo como JSON
+                if (item.getFruit() != null) {
+                    args.putString("fruitJson", new Gson().toJson(item.getFruit()));
+                }
                 navController.navigate(R.id.requestDetailFragment, args);
 
-
-                // Cerrar el diálogo de notificaciones
                 DialogFragment dialogFragment = (DialogFragment)
                         ((FragmentActivity) v.getContext())
                                 .getSupportFragmentManager()
@@ -88,6 +95,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 }
             });
         }
+
     }
 
 

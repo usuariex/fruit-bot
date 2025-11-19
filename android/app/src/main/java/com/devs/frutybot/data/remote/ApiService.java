@@ -25,5 +25,10 @@ public interface ApiService {
             @Part MultipartBody.Part file,
             @Part("text") RequestBody text
     );
+    @GET("api/frutas/buscar")
+    Call<List<FruitDto>> buscarFrutas(
+            @Query("nombre") String nombre
+    );
+
 }
 

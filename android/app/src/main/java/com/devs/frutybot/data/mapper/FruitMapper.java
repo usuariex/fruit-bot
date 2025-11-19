@@ -14,6 +14,7 @@ public class FruitMapper {
                 dto.getImagen().trim(),
                 dto.getDescripcion()
         );
+
     }
 
     public static List<Fruit> toDomainList(List<FruitDto> dtos) {

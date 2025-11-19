@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+
+import com.devs.frutybot.common.Config;
 import com.devs.frutybot.data.local.UserSession;
 
 import com.devs.frutybot.data.ws.WsManager;
@@ -28,12 +30,14 @@ public class MainActivity extends AppCompatActivity {
     @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        androidx.core.splashscreen.SplashScreen splashScreen =
+                androidx.core.splashscreen.SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // Inicializar WebSocket global
         wsManager = new WsManager();
-        wsManager.connect("ws://192.168.100.176:3020/ws");
+        wsManager.connect("ws://"+ Config.BASE_URL +":3020/ws");
 
         // Referencia al Toolbar superior
         MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
@@ -87,10 +91,12 @@ public class MainActivity extends AppCompatActivity {
                     || super.onOptionsItemSelected(item);
         });
 
+
         NavigationUI.setupWithNavController(bottomNav, navController);
     }
 
     public WsManager getWsManager() {
         return wsManager;
     }
+
 }
