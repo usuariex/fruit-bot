@@ -3,7 +3,6 @@ import {
     listarFrutas,
     listarFrutasPorDepto,
     recibirImg
-
 } from '../controllers/frutaController.js';
 import multer from 'multer';
 import path from 'path';
