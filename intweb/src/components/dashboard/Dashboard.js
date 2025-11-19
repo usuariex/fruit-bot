@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Bar, Pie, Line } from 'react-chartjs-2'; // Cambiamos Doughnut por Pie
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -31,7 +31,7 @@ const API_URL = 'http://localhost:3020/api/analytics';
 
 function Dashboard() {
   const [topFrutasData, setTopFrutasData] = useState(null);
-  const [topDepartamentosData, setTopDepartamentosData] = useState(null);
+  const [logDistributionData, setLogDistributionData] = useState(null); // Nuevo estado para el nuevo gráfico
   const [actividadSesionesData, setActividadSesionesData] = useState(null);
 
   // Envolvemos la lógica de fetching en una función que podamos llamar cuando queramos
@@ -85,7 +85,7 @@ function Dashboard() {
     };
 
     fetchData('top-frutas', setTopFrutasData);
-    fetchData('top-departamentos', setTopDepartamentosData);
+    fetchData('log-distribution', setLogDistributionData); // Llamamos al nuevo endpoint
     fetchData('actividad-sesiones', setActividadSesionesData);
   };
 
@@ -105,12 +105,12 @@ function Dashboard() {
           {topFrutasData ? <Bar data={topFrutasData} options={{ responsive: true, indexAxis: 'y' }} /> : <p>Cargando datos...</p>}
         </div>
         <div className="chart-card">
-          <h2>Top 5 Departamentos Visitados</h2>
-          {topDepartamentosData ? (
-            topDepartamentosData.labels.length > 0 ? (
-              <Doughnut data={topDepartamentosData} options={{ responsive: true }} />
+          <h2>Resumen de Actividad</h2>
+          {logDistributionData ? (
+            logDistributionData.labels.length > 0 ? (
+              <Pie data={logDistributionData} options={{ responsive: true }} />
             ) : (
-              <p className="no-data-message">No hay datos de visitas a departamentos para mostrar.</p>
+              <p className="no-data-message">No hay datos de actividad para mostrar.</p>
             )
           ) : <p>Cargando datos...</p>}
         </div>

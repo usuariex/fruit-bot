@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { 
     getTopFrutas, 
     getTopDepartamentos, 
-    getActividadSesiones 
+    getActividadSesiones,
+    getLogDistribution
 } from '../controllers/analyticsController.js';
 
 const router = Router();
@@ -15,5 +16,8 @@ router.get('/top-departamentos', getTopDepartamentos);
 
 // Ruta para obtener la actividad de sesiones por día
 router.get('/actividad-sesiones', getActividadSesiones);
+
+// Ruta para obtener la distribución de tipos de log
+router.get('/log-distribution', getLogDistribution);
 
 export default router;

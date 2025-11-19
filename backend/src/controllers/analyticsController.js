@@ -59,3 +59,24 @@ export const getActividadSesiones = async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+// Devuelve la distribución de los tipos de log.
+export const getLogDistribution = async (req, res) => {
+  try {
+    const [rows] = await conexionbd.query(`
+      SELECT 
+        tl.NOMBRE as nombre, 
+        COUNT(l.LOG_ID) as total
+      FROM log l
+      JOIN tipo_log tl ON l.TIPO_LOG_ID = tl.ID_TIPO_LOG
+      GROUP BY l.TIPO_LOG_ID
+      ORDER BY total DESC;
+    `);
+    // Renombramos 'total' a 'vistas' para que el frontend lo procese sin cambios.
+    const formattedRows = rows.map(row => ({ nombre: row.nombre, vistas: row.total }));
+    res.status(200).json(formattedRows);
+  } catch (error) {
+    console.error("Error al obtener la distribución de logs:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};

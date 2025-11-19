@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header/Header'
-import Inicio from './components/body/inicio'
 import Dashboard from './components/dashboard/Dashboard'; 
 import './App.css';
 
@@ -10,8 +9,8 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
-          <Route path="/" element={<Inicio />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* El Dashboard es ahora la página principal */}
+          <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>
     </Router>
