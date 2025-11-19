@@ -21,6 +21,6 @@ public class RequestDetailViewModelFactory implements ViewModelProvider.Factory 
         if (modelClass.isAssignableFrom(RequestDetailViewModel.class)) {
             return (T) new RequestDetailViewModel(wsManager);
         }
-        throw new IllegalArgumentException("vista deconocita");
+        throw new IllegalArgumentException("ViewModel desconocido: " + modelClass.getName());
     }
 }

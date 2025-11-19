@@ -1,4 +1,4 @@
-import express, { json } from 'express';
+import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,7 +8,6 @@ import { config } from "./config.js";
 import frutaRoutes from './routes/frutaRoutes.js';
 import pruevaServer from './routes/pruevaServer.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,37 +28,42 @@ app.use('/api/analytics', analyticsRoutes);
 
 const port = config.port;
 
-
 const server = app.listen(port, "0.0.0.0", () => {
-  console.log(`Servidor en http://localhost:${port}`);
+  console.log(`Servidor en http://10.68.137.219:${port}`);
 });
 
-
+// Diccionario de clientes suscritos
 const clients = {};
-const ws_server = new WebSocketServer({ server, path: "/ws" });
 
+// Crear servidor WebSocket
+const ws_server = new WebSocketServer({ server, path: "/ws" });
 
 ws_server.on("connection", (ws) => {
   console.log("Cliente WS conectado");
 
   ws.on("message", (msg) => {
-      if (data.type === "subscribe" && data.requestId) {
     try {
       const data = JSON.parse(msg);
+
+      if (data.type === "subscribe" && data.requestId) {
         clients[data.requestId] = ws;
         console.log(`Cliente suscrito con requestId: ${data.requestId}`);
-    } catch (err) {
       }
+    } catch (err) {
       console.error("Error al procesar mensaje WS:", err.message);
     }
-});
   });
+
+  ws.on("close", () => {
+    console.log("Cliente WS desconectado");
+  });
+});
 
 
 export function notifyResult(requestId, result) {
   const ws = clients[requestId];
   if (ws && ws.readyState === 1) {
-    ws.send(JSON.stringify({ requestId, ...result  }));
-    delete clients[requestId];
+    ws.send(JSON.stringify({ requestId, ...result }));
+    delete clients[requestId]; // se elimina después de enviar
   }
 }

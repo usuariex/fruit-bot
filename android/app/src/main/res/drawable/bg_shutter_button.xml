@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Anillo exterior -->
+    <item>
+        <shape android:shape="oval">
+            <stroke android:width="4dp" android:color="#DDDDDD"/>
+            <solid android:color="@android:color/transparent"/>
+            <size android:width="72dp" android:height="72dp"/>
+        </shape>
+    </item>
+    <!-- Círculo interior (el botón en sí) -->
+    <item android:top="8dp" android:bottom="8dp" android:left="8dp" android:right="8dp">
+        <shape android:shape="oval">
+            <solid android:color="#FF5E62"/> <!-- Color principal de la app -->
+        </shape>
+    </item>
+</layer-list>

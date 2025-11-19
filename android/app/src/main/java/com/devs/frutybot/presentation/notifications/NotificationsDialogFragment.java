@@ -2,6 +2,9 @@ package com.devs.frutybot.presentation.notifications;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -13,35 +16,49 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.devs.frutybot.NotificationsViewModel;
-import com.devs.frutybot.presentation.adapters.NotificationsAdapter;
 import com.devs.frutybot.R;
+import com.devs.frutybot.presentation.adapters.NotificationsAdapter;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class NotificationsDialogFragment extends DialogFragment {
+
+    private NotificationsViewModel notificationsViewModel;
+    private NotificationsAdapter adapter;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Usar el ViewModel compartido
-        NotificationsViewModel notificationsViewModel =
-                new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-
-        // Inflar layout con RecyclerView
-        RecyclerView recyclerView = new RecyclerView(requireContext());
+        View content = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_notifications_container, null);
+        RecyclerView recyclerView = content.findViewById(R.id.recyclerNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Obtener el NavController desde el host fragment
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-
-        // Pasar el NavController al adapter
-        NotificationsAdapter adapter = new NotificationsAdapter(navController);
+        adapter = new NotificationsAdapter(item -> {
+            // Navegar al detalle
+            // Primero cerramos el dialog
+            dismiss();
+            
+            // Buscamos el NavController
+            // IMPORTANTE: Usamos requireActivity() para buscar el NavHostFragment 
+            // ya que estamos en un DialogFragment sobre la Activity
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            Bundle args = new Bundle();
+            args.putString("requestId", item.getRequestId());
+            navController.navigate(R.id.requestDetailFragment, args);
+        });
         recyclerView.setAdapter(adapter);
 
-        // Observar la lista de solicitudes
+        // ViewModel compartido con la Activity
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        
+        // Observa la lista usando el DialogFragment como LifecycleOwner
         notificationsViewModel.getRequests().observe(this, adapter::submitList);
 
         return new AlertDialog.Builder(requireContext())
-                .setTitle("Solicitudes pendientes")
-                .setView(recyclerView)
+                .setTitle("Solicitudes")
+                .setView(content)
                 .setPositiveButton("Cerrar", (dialog, which) -> dialog.dismiss())
                 .create();
     }

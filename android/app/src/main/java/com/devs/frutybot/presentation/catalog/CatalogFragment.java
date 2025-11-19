@@ -17,7 +17,9 @@ import com.devs.frutybot.R;
 import com.devs.frutybot.presentation.adapters.FruitAdapter;
 import android.widget.ImageButton;
 
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class CatalogFragment extends Fragment {
 
     private CatalogViewModel viewModel;
@@ -44,7 +46,7 @@ public class CatalogFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(CatalogViewModel.class);
 
         // Recibir argumento del departamento
-        String departamento = getArguments().getString("department", "");
+        String departamento = getArguments() != null ? getArguments().getString("department", "") : "";
 
         // Observar frutas
         viewModel.getFrutas().observe(getViewLifecycleOwner(), frutas -> {
@@ -57,6 +59,8 @@ public class CatalogFragment extends Fragment {
         });
 
         // Cargar frutas
-        viewModel.loadFruits(departamento);
+        if (savedInstanceState == null) {
+            viewModel.loadFruits(departamento);
+        }
     }
 }

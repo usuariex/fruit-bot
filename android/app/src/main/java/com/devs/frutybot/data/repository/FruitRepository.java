@@ -1,8 +1,7 @@
 package com.devs.frutybot.data.repository;
 
 import com.devs.frutybot.data.dto.Fruit;
-import com.devs.frutybot.data.dto.UploadResponse;
-import com.devs.frutybot.data.remote.ApiClient;
+import com.devs.frutybot.data.dto.UploadResponseStart;
 import com.devs.frutybot.data.remote.ApiService;
 import com.devs.frutybot.data.mapper.FruitMapper;
 import com.devs.frutybot.data.util.RepositoryCallback;
@@ -11,6 +10,9 @@ import com.devs.frutybot.domain.model.FruitDomain;
 import java.io.File;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -18,9 +20,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FruitRepository {
-    private final ApiService apiService = ApiClient.getApiService();
+    private final ApiService apiService;
 
-    // Método para obtener frutas por departamento (usa DTO Fruit y lo convierte a FruitDomain)
+    @Inject
+    public FruitRepository(ApiService apiService) {
+        this.apiService = apiService;
+    }
+
+    public FruitRepository() {
+        // Constructor vacío para compatibilidad temporal si algo no usa DI aun,
+        // pero idealmente deberíamos usar inyección.
+        // Por ahora lo dejaremos como fallback llamando a ApiClient antiguo o null
+        // PERO mejor eliminamos dependencia de ApiClient estático para forzar DI.
+        this.apiService = com.devs.frutybot.data.remote.ApiClient.getApiService();
+    }
+
+    // Método para obtener frutas por departamento
     public void getFruitsByDepartment(String depto, final RepositoryCallback<List<FruitDomain>> callback) {
         apiService.getFruitsByDepartment(depto).enqueue(new Callback<List<Fruit>>() {
             @Override
@@ -40,22 +55,21 @@ public class FruitRepository {
         });
     }
 
-    // Método para subir foto con texto
-    public void uploadPhoto(File photo, String text, final RepositoryCallback<UploadResponse> callback) {
+    public void uploadPhoto(File photo, String text, final RepositoryCallback<UploadResponseStart> callback) {
         RequestBody requestFile = RequestBody.create(
-                okhttp3.MediaType.parse("image/jpeg"),
+                MediaType.parse("image/jpeg"),
                 photo
         );
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", photo.getName(), requestFile);
 
         RequestBody textBody = RequestBody.create(
-                okhttp3.MediaType.parse("text/plain"),
+                MediaType.parse("text/plain"),
                 text
         );
 
-        apiService.uploadFruitImage(body, textBody).enqueue(new Callback<UploadResponse>() {
+        apiService.uploadFruitImage(body, textBody).enqueue(new Callback<UploadResponseStart>() {
             @Override
-            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+            public void onResponse(Call<UploadResponseStart> call, Response<UploadResponseStart> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
@@ -64,7 +78,7 @@ public class FruitRepository {
             }
 
             @Override
-            public void onFailure(Call<UploadResponse> call, Throwable t) {
+            public void onFailure(Call<UploadResponseStart> call, Throwable t) {
                 callback.onError(t);
             }
         });
@@ -89,6 +103,4 @@ public class FruitRepository {
             }
         });
     }
-
-
 }

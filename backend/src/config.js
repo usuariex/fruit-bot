@@ -7,6 +7,6 @@ export const config = {
   dbName: process.env.DB_NAME,
   dbUser: process.env.DB_USER,
   dbPass: process.env.DB_PASS,
-  port: process.env.PORT || 3021,
+  port: process.env.PORT,
   baseUrlTemp: `http://${process.env.MI_IPLOCAL}:${process.env.PORT}/public/images_android/temp/`
 };

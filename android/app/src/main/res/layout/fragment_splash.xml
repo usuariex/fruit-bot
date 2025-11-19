@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@drawable/bg_splash_fruit"
+    tools:context=".presentation.splash.SplashFragment">
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_gravity="center"
-        android:src="@drawable/splash"
-        android:contentDescription="Logo" />
-</FrameLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Título Principal -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FrutyBot"
+            android:textSize="48sp"
+            android:textStyle="bold|italic"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-medium"
+            android:shadowColor="#40000000"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="8"/>
+
+        <!-- Subtítulo o eslogan pequeño -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tu experto en frutas"
+            android:textSize="16sp"
+            android:textColor="#EFEFEF"
+            android:layout_marginTop="8dp"
+            android:letterSpacing="0.1"
+            android:alpha="0.9"/>
+            
+    </LinearLayout>
+
+    <!-- Indicador de carga sutil (opcional) -->
+    <ProgressBar
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@android:color/white"/>
+
+</RelativeLayout>
