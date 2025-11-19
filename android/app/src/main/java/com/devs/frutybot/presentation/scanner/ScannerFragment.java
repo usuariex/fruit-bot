@@ -65,15 +65,19 @@ public class ScannerFragment extends Fragment {
         // ViewModel compartido para notificaciones
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
-        // ViewModel propio del scanner
+
+
+
+
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
+
         viewModel.getFruitInfo().observe(getViewLifecycleOwner(), response -> {
             if (response != null && response.getRequestId() != null) {
-                // Crear RequestItemDto inicial con datos del UploadResponse
+                // Crear RequestItemDto inicial con datos del UploadResponseStart
                 RequestItemDto item = new RequestItemDto(
                         response.getRequestId(),
                         response.getStatus() != null ? response.getStatus() : "Procesando",
-                        response.getImageUrl() // 👈 miniatura si el backend la envía
+                        response.getImageUrl()
                 );
                 notificationsViewModel.addRequest(item);
 
@@ -110,6 +114,7 @@ public class ScannerFragment extends Fragment {
                 Toast.makeText(requireContext(), "Error al subir la foto", Toast.LENGTH_SHORT).show();
             }
         });
+
 
 
 

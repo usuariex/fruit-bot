@@ -1,6 +1,6 @@
 package com.devs.frutybot.domain.usecase;
 
-import com.devs.frutybot.data.dto.UploadResponse;
+import com.devs.frutybot.data.dto.UploadResponseStart;
 import com.devs.frutybot.data.repository.FruitRepository;
 import com.devs.frutybot.data.util.RepositoryCallback;
 
@@ -13,7 +13,7 @@ public class UploadFruitUseCase {
         this.repository = repository;
     }
 
-    public void execute(File photo, String text, RepositoryCallback<UploadResponse> callback) {
+    public void execute(File photo, String text, RepositoryCallback<UploadResponseStart> callback) {
         repository.uploadPhoto(photo, text, callback);
     }
 }

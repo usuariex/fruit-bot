@@ -1,7 +1,7 @@
 package com.devs.frutybot.data.repository;
 
 import com.devs.frutybot.data.dto.Fruit;
-import com.devs.frutybot.data.dto.UploadResponse;
+import com.devs.frutybot.data.dto.UploadResponseStart;
 import com.devs.frutybot.data.remote.ApiClient;
 import com.devs.frutybot.data.remote.ApiService;
 import com.devs.frutybot.data.mapper.FruitMapper;
@@ -11,6 +11,7 @@ import com.devs.frutybot.domain.model.FruitDomain;
 import java.io.File;
 import java.util.List;
 
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -40,22 +41,21 @@ public class FruitRepository {
         });
     }
 
-    // Método para subir foto con texto
-    public void uploadPhoto(File photo, String text, final RepositoryCallback<UploadResponse> callback) {
+    public void uploadPhoto(File photo, String text, final RepositoryCallback<UploadResponseStart> callback) {
         RequestBody requestFile = RequestBody.create(
-                okhttp3.MediaType.parse("image/jpeg"),
+                MediaType.parse("image/jpeg"),
                 photo
         );
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", photo.getName(), requestFile);
 
         RequestBody textBody = RequestBody.create(
-                okhttp3.MediaType.parse("text/plain"),
+                MediaType.parse("text/plain"),
                 text
         );
 
-        apiService.uploadFruitImage(body, textBody).enqueue(new Callback<UploadResponse>() {
+        apiService.uploadFruitImage(body, textBody).enqueue(new Callback<UploadResponseStart>() {
             @Override
-            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+            public void onResponse(Call<UploadResponseStart> call, Response<UploadResponseStart> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
@@ -64,7 +64,7 @@ public class FruitRepository {
             }
 
             @Override
-            public void onFailure(Call<UploadResponse> call, Throwable t) {
+            public void onFailure(Call<UploadResponseStart> call, Throwable t) {
                 callback.onError(t);
             }
         });

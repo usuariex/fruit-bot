@@ -6,9 +6,9 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+        android:layout_width="345dp"
+        android:layout_height="569dp"
         android:layout_gravity="center"
-        android:src="@drawable/splash"
-        android:contentDescription="Logo" />
+        android:contentDescription="Logo"
+        android:src="@drawable/splash" />
 </FrameLayout>

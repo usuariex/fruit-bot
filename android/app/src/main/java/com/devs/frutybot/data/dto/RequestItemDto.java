@@ -6,13 +6,23 @@ public class RequestItemDto {
     private FruitDto fruit; // objeto completo del backend
     private String photoPath; // opcional, para mostrar miniatura
 
+    // Constructor para la primera respuesta
     public RequestItemDto(String requestId, String status, String photoPath) {
         this.requestId = requestId;
         this.status = status;
         this.photoPath = photoPath;
     }
 
+    // Constructor opcional para cuando ya tienes el objeto FruitDto
+    public RequestItemDto(String requestId, String status, String photoPath, FruitDto fruit) {
+        this.requestId = requestId;
+        this.status = status;
+        this.photoPath = photoPath;
+        this.fruit = fruit;
+    }
+
     public String getRequestId() { return requestId; }
+
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
