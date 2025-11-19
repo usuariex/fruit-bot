@@ -6,16 +6,17 @@ import androidx.lifecycle.ViewModel;
 
 import com.devs.frutybot.data.repository.FruitRepository;
 import com.devs.frutybot.data.util.RepositoryCallback;
-import com.devs.frutybot.domain.model.Fruit;
+import com.devs.frutybot.domain.model.FruitDomain;
 
 import java.util.List;
 
 public class CatalogViewModel extends ViewModel {
-    private final MutableLiveData<List<Fruit>> frutas = new MutableLiveData<>();
+    // Ahora usamos FruitDomain en lugar de Fruit
+    private final MutableLiveData<List<FruitDomain>> frutas = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final FruitRepository repository = new FruitRepository();
 
-    public LiveData<List<Fruit>> getFrutas() {
+    public LiveData<List<FruitDomain>> getFrutas() {
         return frutas;
     }
 
@@ -24,9 +25,9 @@ public class CatalogViewModel extends ViewModel {
     }
 
     public void loadFruits(String department) {
-        repository.getFruitsByDepartment(department, new RepositoryCallback<List<Fruit>>() {
+        repository.getFruitsByDepartment(department, new RepositoryCallback<List<FruitDomain>>() {
             @Override
-            public void onSuccess(List<Fruit> data) {
+            public void onSuccess(List<FruitDomain> data) {
                 frutas.postValue(data);
             }
 
@@ -36,5 +37,4 @@ public class CatalogViewModel extends ViewModel {
             }
         });
     }
-
 }

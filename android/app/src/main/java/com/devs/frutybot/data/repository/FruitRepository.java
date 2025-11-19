@@ -1,23 +1,18 @@
 package com.devs.frutybot.data.repository;
 
+import com.devs.frutybot.data.dto.Fruit;
 import com.devs.frutybot.data.dto.UploadResponse;
 import com.devs.frutybot.data.remote.ApiClient;
 import com.devs.frutybot.data.remote.ApiService;
-import com.devs.frutybot.data.dto.FruitDto;
 import com.devs.frutybot.data.mapper.FruitMapper;
 import com.devs.frutybot.data.util.RepositoryCallback;
-import com.devs.frutybot.domain.model.Fruit;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.devs.frutybot.domain.model.FruitDomain;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,27 +20,27 @@ import retrofit2.Response;
 public class FruitRepository {
     private final ApiService apiService = ApiClient.getApiService();
 
-    public void getFruitsByDepartment(String depto, final RepositoryCallback<List<Fruit>> callback) {
-        apiService.getFruitsByDepartment(depto).enqueue(new Callback<List<FruitDto>>() {
+    // Método para obtener frutas por departamento (usa DTO Fruit y lo convierte a FruitDomain)
+    public void getFruitsByDepartment(String depto, final RepositoryCallback<List<FruitDomain>> callback) {
+        apiService.getFruitsByDepartment(depto).enqueue(new Callback<List<Fruit>>() {
             @Override
-            public void onResponse(Call<List<FruitDto>> call, Response<List<FruitDto>> response) {
+            public void onResponse(Call<List<Fruit>> call, Response<List<Fruit>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Fruit> fruits = FruitMapper.toDomainList(response.body());
+                    List<FruitDomain> fruits = FruitMapper.toDomainList(response.body());
                     callback.onSuccess(fruits);
                 } else {
-                    callback.onError(new Throwable("Error en la respuesta"));
+                    callback.onError(new Throwable("Error en la respuesta: " + response.code()));
                 }
             }
 
             @Override
-            public void onFailure(Call<List<FruitDto>> call, Throwable t) {
+            public void onFailure(Call<List<Fruit>> call, Throwable t) {
                 callback.onError(t);
             }
         });
     }
 
-
-
+    // Método para subir foto con texto
     public void uploadPhoto(File photo, String text, final RepositoryCallback<UploadResponse> callback) {
         RequestBody requestFile = RequestBody.create(
                 okhttp3.MediaType.parse("image/jpeg"),
@@ -62,7 +57,6 @@ public class FruitRepository {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // 👈 devolvemos el objeto completo con message, requestId, status, imageUrl
                     callback.onSuccess(response.body());
                 } else {
                     callback.onError(new Throwable("Error en la respuesta: " + response.code()));
@@ -77,6 +71,24 @@ public class FruitRepository {
     }
 
 
+    public void searchFruits(String query, final RepositoryCallback<List<FruitDomain>> callback) {
+        apiService.searchFruits(query).enqueue(new Callback<List<Fruit>>() {
+            @Override
+            public void onResponse(Call<List<Fruit>> call, Response<List<Fruit>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<FruitDomain> fruits = FruitMapper.toDomainList(response.body());
+                    callback.onSuccess(fruits);
+                } else {
+                    callback.onError(new Throwable("Error en la respuesta: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Fruit>> call, Throwable t) {
+                callback.onError(t);
+            }
+        });
+    }
 
 
 }

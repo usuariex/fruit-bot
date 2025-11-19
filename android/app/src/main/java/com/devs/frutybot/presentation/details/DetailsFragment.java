@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.devs.frutybot.R;
-import com.devs.frutybot.data.dto.FruitDto;
+import com.devs.frutybot.domain.model.FruitDomain;
 
 public class DetailsFragment extends Fragment {
 
@@ -41,17 +41,22 @@ public class DetailsFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(DetailsViewModel.class);
 
+        // Observamos FruitDomain en lugar de FruitDto
         viewModel.getFruit().observe(getViewLifecycleOwner(), this::bindData);
 
         // Carga frutas del departamento "Lima" como ejemplo
         viewModel.loadFruitByDepartment("Lima");
     }
 
-    private void bindData(FruitDto fruit) {
+    // Ahora bindData recibe FruitDomain
+    private void bindData(FruitDomain fruit) {
         textViewNombre.setText(fruit.getNombre());
         textViewDescripcion.setText(fruit.getDescripcion());
-        textViewDeptoNombre.setText(fruit.getDepartamentoNombre());
-        textViewDeptoDescripcion.setText(fruit.getDepartamentoDescripcion());
+
+        // Como FruitDomain no tiene departamentoNombre/descripcion,
+        // puedes ocultar esos TextView o dejarlos vacíos
+        textViewDeptoNombre.setText("");
+        textViewDeptoDescripcion.setText("");
 
         Glide.with(requireContext())
                 .load(fruit.getImagen())

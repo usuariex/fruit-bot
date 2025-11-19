@@ -1,25 +1,25 @@
-
 package com.devs.frutybot.domain.model;
 
-public class Fruit {
+
+public class FruitDomain {
     private int id;
     private String nombre;
     private String imagen;
     private String descripcion;
 
-    public Fruit(int id, String nombre, String imagen, String descripcion) {
+    public FruitDomain(int id, String nombre, String imagen, String descripcion) {
         this.id = id;
         this.nombre = nombre;
         this.imagen = imagen;
         this.descripcion = descripcion;
     }
 
-    public int getId() {
-        return id;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getImagen() {
@@ -30,12 +30,12 @@ public class Fruit {
         this.imagen = imagen;
     }
 
-    public String getNombre() {
-        return nombre;
+    public int getId() {
+        return id;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getDescripcion() {
