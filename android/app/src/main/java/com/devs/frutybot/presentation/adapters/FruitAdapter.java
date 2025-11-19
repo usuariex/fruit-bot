@@ -11,16 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.devs.frutybot.R;
-import com.devs.frutybot.domain.model.Fruit;
+import com.devs.frutybot.domain.model.FruitDomain;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.FrutaViewHolder> {
-    private List<Fruit> frutas = new ArrayList<>();
+    private List<FruitDomain> frutas = new ArrayList<>();
 
-    public void setFrutas(List<Fruit> frutas) {
-        this.frutas = frutas;
+    // Ahora recibe directamente List<FruitDomain>
+    public void setFrutas(List<FruitDomain> frutas) {
+        this.frutas = frutas != null ? frutas : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -34,7 +35,7 @@ public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.FrutaViewHol
 
     @Override
     public void onBindViewHolder(@NonNull FrutaViewHolder holder, int position) {
-        Fruit fruta = frutas.get(position);
+        FruitDomain fruta = frutas.get(position);
         holder.nombre.setText(fruta.getNombre());
         holder.descripcion.setText(fruta.getDescripcion());
         Glide.with(holder.itemView.getContext())

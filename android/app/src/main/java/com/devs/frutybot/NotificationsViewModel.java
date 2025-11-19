@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.devs.frutybot.data.dto.FruitDto;
 import com.devs.frutybot.data.dto.RequestItemDto;
 
 import java.util.ArrayList;
@@ -22,16 +23,17 @@ public class NotificationsViewModel extends ViewModel {
         requests.setValue(current);
     }
 
-    public void updateRequest(String requestId, String status, String fruta, String departamento) {
+    public void updateRequest(String requestId, String status, FruitDto fruit)
+    {
         List<RequestItemDto> current = new ArrayList<>(requests.getValue());
         for (RequestItemDto item : current) {
             if (item.getRequestId().equals(requestId)) {
                 item.setStatus(status);
-                item.setFruta(fruta);
-                item.setDepartamento(departamento);
+                item.setFruit(fruit);
                 break;
             }
         }
+
         requests.setValue(current);
     }
 

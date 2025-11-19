@@ -1,15 +1,12 @@
-import Header from './components/Header'
+import Header from './components/Header/Header'
+import Inicio from './components/body/inicio'
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <Header />
-      </header>
-      <body>
-        
-      </body>
+      <Header />
+      <Inicio />
     </div>
   );
 }

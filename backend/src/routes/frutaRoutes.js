@@ -20,7 +20,13 @@ const storage = multer.diskStorage({
     cb(null, path.join(process.cwd(), "public/images_android/temp"));
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+
+    
+    /* cb(null, file.originalname); */
+
+    const timestamp = Date.now();
+    cb(null, `${timestamp}-${file.originalname}`);
+
   },
 });
 

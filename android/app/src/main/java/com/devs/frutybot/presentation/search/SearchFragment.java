@@ -50,9 +50,10 @@ public class SearchFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         // Observer que actualiza el recyclerview
-        viewModel.fruits.observe(getViewLifecycleOwner(), fruits -> {
-            adapter.setFrutas(fruits); // Ya existe, no se duplica
+        viewModel.getFruits().observe(getViewLifecycleOwner(), fruits -> {
+            adapter.setFrutas(fruits);
         });
+
 
         // Listener del buscador
         etSearch.addTextChangedListener(new TextWatcher() {
