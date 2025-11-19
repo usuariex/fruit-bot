@@ -29,7 +29,7 @@ app.use('/api/analytics', analyticsRoutes);
 const port = config.port;
 
 const server = app.listen(port, "0.0.0.0", () => {
-  console.log(`Servidor en http://localhost:${port}`);
+  console.log(`Servidor en http://10.68.137.219:${port}`);
 });
 
 // Diccionario de clientes suscritos
