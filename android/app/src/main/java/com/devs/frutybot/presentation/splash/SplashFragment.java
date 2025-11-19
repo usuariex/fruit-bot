@@ -18,7 +18,7 @@ import com.devs.frutybot.data.local.UserSession;
 
 public class SplashFragment extends Fragment {
 
-    private static final long SPLASH_DURATION = 2000; // 2 segundos
+    private static final long SPLASH_DURATION = 2000;
 
     @Nullable
     @Override

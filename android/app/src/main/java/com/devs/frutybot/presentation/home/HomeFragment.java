@@ -21,9 +21,19 @@ import com.devs.frutybot.presentation.adapters.DepartmentAdapter;
 import java.util.Arrays;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerDepartments;
+    
+    // Usar la constante directa de Config para asegurar que se use la IP actualizada
+    // NOTA: Asegúrate de que Config.BASE_URL ya no tenga el puerto si las rutas de imagen no lo necesitan, 
+    // o ajusta aquí si tus imágenes están en el mismo puerto que la API.
+    // Según tu server.js, las imágenes estáticas se sirven en el mismo express app, 
+    // así que BASE_URL debe incluir puerto.
     private String mi_ip_local = Config.BASE_URL;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -31,6 +41,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerDepartments = view.findViewById(R.id.recyclerDepartments);
 
+        // Se usa mi_ip_local (que viene de Config.BASE_URL)
         List<Department> list = Arrays.asList(
                 new Department("Amazonas", mi_ip_local + "/public/depto/Amazonas.jpg"),
                 new Department("Áncash", mi_ip_local + "/public/depto/Ancash.jpg"),
@@ -57,7 +68,6 @@ public class HomeFragment extends Fragment {
                 new Department("Tacna", mi_ip_local + "/public/depto/Tacna.jpg"),
                 new Department("Tumbes", mi_ip_local + "/public/depto/Tumbes.jpg"),
                 new Department("Ucayali", mi_ip_local + "/public/depto/Ucayali.jpg")
-
         );
 
         DepartmentAdapter adapter = new DepartmentAdapter(list, departmentName -> {

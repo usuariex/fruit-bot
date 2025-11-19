@@ -6,20 +6,29 @@ import androidx.lifecycle.ViewModel;
 
 import com.devs.frutybot.data.dto.Fruit;
 import com.devs.frutybot.data.mapper.FruitMapper;
-import com.devs.frutybot.data.remote.ApiClient;
 import com.devs.frutybot.data.remote.ApiService;
 import com.devs.frutybot.domain.model.FruitDomain;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@HiltViewModel
 public class DetailsViewModel extends ViewModel {
 
     private final MutableLiveData<FruitDomain> fruitLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
+    private final ApiService apiService;
+
+    @Inject
+    public DetailsViewModel(ApiService apiService) {
+        this.apiService = apiService;
+    }
 
     public LiveData<FruitDomain> getFruit() {
         return fruitLiveData;
@@ -30,7 +39,6 @@ public class DetailsViewModel extends ViewModel {
     }
 
     public void loadFruitByDepartment(String departamento) {
-        ApiService apiService = ApiClient.getApiService();
         apiService.getFruitsByDepartment(departamento).enqueue(new Callback<List<Fruit>>() {
             @Override
             public void onResponse(Call<List<Fruit>> call, Response<List<Fruit>> response) {

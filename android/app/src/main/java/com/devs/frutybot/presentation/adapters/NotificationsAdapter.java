@@ -1,7 +1,5 @@
 package com.devs.frutybot.presentation.adapters;
 
-import android.net.Uri;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,94 +7,96 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.navigation.NavController;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.devs.frutybot.R;
 import com.devs.frutybot.data.dto.RequestItemDto;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.List;
+public class NotificationsAdapter extends ListAdapter<RequestItemDto, NotificationsAdapter.ViewHolder> {
 
-public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
-    private List<RequestItemDto> requests = new ArrayList<>();
-    private NavController navController;
-
-    public NotificationsAdapter(NavController navController) {
-        this.navController = navController;
+    public interface OnItemClick {
+        void onClick(RequestItemDto item);
     }
 
-    public void submitList(List<RequestItemDto> newRequests) {
-        requests = newRequests;
-        notifyDataSetChanged();
+    private final OnItemClick onItemClick;
+
+    public NotificationsAdapter(OnItemClick onItemClick) {
+        super(DIFF_CALLBACK);
+        this.onItemClick = onItemClick;
     }
+
+    public static final DiffUtil.ItemCallback<RequestItemDto> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<RequestItemDto>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull RequestItemDto oldItem, @NonNull RequestItemDto newItem) {
+                    return oldItem.getRequestId().equals(newItem.getRequestId());
+                }
+
+                @Override
+                public boolean areContentsTheSame(@NonNull RequestItemDto oldItem, @NonNull RequestItemDto newItem) {
+                    // Comparamos campos relevantes para re-renderizar
+                    boolean sameStatus = safeEquals(oldItem.getStatus(), newItem.getStatus());
+                    boolean samePhoto = safeEquals(oldItem.getPhotoPath(), newItem.getPhotoPath());
+                    boolean sameFruitName =
+                            oldItem.getFruit() == null && newItem.getFruit() == null
+                                    || (oldItem.getFruit() != null && newItem.getFruit() != null
+                                    && safeEquals(oldItem.getFruit().getNombre(), newItem.getFruit().getNombre()));
+                    return sameStatus && samePhoto && sameFruitName;
+                }
+
+                private boolean safeEquals(String a, String b) {
+                    return (a == null && b == null) || (a != null && a.equals(b));
+                }
+            };
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public NotificationsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_request, parent, false);
         return new ViewHolder(view);
     }
 
-
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RequestItemDto item = requests.get(position);
-        holder.bind(item, navController);
+    public void onBindViewHolder(@NonNull NotificationsAdapter.ViewHolder holder, int position) {
+        holder.bind(getItem(position), onItemClick);
     }
 
-    @Override
-    public int getItemCount() {
-        return requests.size();
-    }
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtStatus;
-        ImageView imgPhoto;
+        private final TextView txtStatus;
+        private final ImageView imgPhoto;
 
         ViewHolder(View itemView) {
             super(itemView);
             txtStatus = itemView.findViewById(R.id.txtStatus);
-            imgPhoto = itemView.findViewById(R.id.imgPhoto);
+            imgPhoto  = itemView.findViewById(R.id.imgPhoto);
         }
 
-        void bind(RequestItemDto item, NavController navController) {
-            if (item.getFruit() != null) {
+        void bind(RequestItemDto item, OnItemClick onItemClick) {
+            if (item.getFruit() != null && item.getFruit().getNombre() != null) {
                 txtStatus.setText(item.getStatus() + " - " + item.getFruit().getNombre());
             } else {
                 txtStatus.setText(item.getStatus());
             }
 
-            if (item.getPhotoPath() != null) {
-                imgPhoto.setImageURI(Uri.parse(item.getPhotoPath()));
+            // Cargar miniatura con Glide (photoPath viene como URL del backend)
+            if (item.getPhotoPath() != null && !item.getPhotoPath().isEmpty()) {
+                Glide.with(imgPhoto.getContext())
+                        .load(item.getPhotoPath())
+                        .placeholder(R.drawable.ic_fruit_placeholder)
+                        .error(R.drawable.ic_fruit_placeholder)
+                        .centerCrop()
+                        .into(imgPhoto);
             } else {
                 imgPhoto.setImageResource(R.drawable.ic_fruit_placeholder);
             }
 
-            // Click para navegar al detalle
             itemView.setOnClickListener(v -> {
-                Bundle args = new Bundle();
-                args.putString("requestId", item.getRequestId());
-                // Aquí también podrías pasar el FruitDto completo como JSON
-                if (item.getFruit() != null) {
-                    args.putString("fruitJson", new Gson().toJson(item.getFruit()));
-                }
-                navController.navigate(R.id.requestDetailFragment, args);
-
-                DialogFragment dialogFragment = (DialogFragment)
-                        ((FragmentActivity) v.getContext())
-                                .getSupportFragmentManager()
-                                .findFragmentByTag("NotificationsDialog");
-                if (dialogFragment != null) {
-                    dialogFragment.dismiss();
-                }
+                if (onItemClick != null) onItemClick.onClick(item);
             });
         }
-
     }
-
-
 }

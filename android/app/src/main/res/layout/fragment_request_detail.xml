@@ -1,30 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/txtDetailTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Detalle de la solicitud"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/txtDetailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detalle de la solicitud"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
 
-    <TextView
-        android:id="@+id/txtFruitName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fruta:" />
+        <!-- Imagen grande del detalle -->
+        <ImageView
+            android:id="@+id/imgFruitDetail"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_fruit_placeholder"/>
 
-    <TextView
-        android:id="@+id/txtStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Estado:" />
+        <TextView
+            android:id="@+id/txtFruitName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fruta: "
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado: "
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_green_dark"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/txtDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"/>
+
+    </LinearLayout>
+</ScrollView>

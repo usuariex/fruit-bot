@@ -1,5 +1,6 @@
 package com.devs.frutybot.data.dto;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class FruitDto {
@@ -7,8 +8,13 @@ public class FruitDto {
     private String pais;
     private String departamento;
     private String descripcion;
+
+    @SerializedName("proceso_de_maduracion")
     private String procesoDeMaduracion;
+
+    @SerializedName("informacion_nutricional")
     private String informacionNutricional;
+
     private String calorias;
     private List<String> vitaminas;
     private String fibra;
@@ -56,6 +62,4 @@ public class FruitDto {
 
     public String getValida() { return valida; }
     public void setValida(String valida) { this.valida = valida; }
-
-
 }

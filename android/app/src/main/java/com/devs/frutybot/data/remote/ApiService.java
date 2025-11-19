@@ -1,8 +1,7 @@
 package com.devs.frutybot.data.remote;
 
 import com.devs.frutybot.data.dto.Fruit;
-import com.devs.frutybot.data.dto.FruitDto;
-import com.devs.frutybot.data.dto.UploadResponse;
+import com.devs.frutybot.data.dto.UploadResponseStart;
 
 
 import java.util.List;
@@ -23,14 +22,19 @@ public interface ApiService {
 
     @Multipart
     @POST("api/frutas/recibirImg")
-    Call<UploadResponse> uploadFruitImage(
+    Call<UploadResponseStart> uploadFruitImage(
             @Part MultipartBody.Part file,
             @Part("text") RequestBody text
     );
+
+
+
+
    /* @GET("api/frutas/buscar")
     Call<List<FruitDto>> buscarFrutas(
             @Query("nombre") String nombre
     );*/
+
 
     @GET("api/frutas/buscar")
     Call<List<Fruit>> searchFruits(@Query("q") String query);

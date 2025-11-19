@@ -1,39 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/splashFragment">
 
-
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.devs.frutybot.presentation.splash.SplashFragment"
         android:label="Splash"
         tools:layout="@layout/fragment_splash">
-
+        <!-- Splash decide destino según sesión; limpiar back stack -->
         <action
             android:id="@+id/action_splashFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
     </fragment>
+
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.devs.frutybot.presentation.search.SearchFragment"
-        android:label="Search"/>
+        android:label="Search"
+        tools:layout="@layout/fragment_search" />
 
     <fragment
         android:id="@+id/scannerFragment"
         android:name="com.devs.frutybot.presentation.scanner.ScannerFragment"
-        android:label="Scanner"/>
+        android:label="Scanner"
+        tools:layout="@layout/fragment_scanner" />
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.devs.frutybot.presentation.home.HomeFragment"
-        android:label="Home">
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_catalogFragment"
             app:destination="@id/catalogFragment" />
@@ -42,44 +48,47 @@
     <fragment
         android:id="@+id/catalogFragment"
         android:name="com.devs.frutybot.presentation.catalog.CatalogFragment"
-        android:label="Catalog">
+        android:label="Catalog"
+        tools:layout="@layout/fragment_catalog">
         <argument
             android:name="department"
-            app:argType="string"/>
+            app:argType="string" />
     </fragment>
 
-
-    <!-- ✓ Login -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.devs.frutybot.presentation.login.LoginFragment"
-        android:label="Login">
-
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+        <!-- navegar a home limpiando back stack -->
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
-    <!-- ✓ Register -->
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.devs.frutybot.presentation.register.RegisterFragment"
-        android:label="Register"/>
+        android:label="Register"
+        tools:layout="@layout/fragment_register">
+        <!-- navegar a home limpiando back stack -->
+        <action
+            android:id="@+id/action_registerFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/registerFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.devs.frutybot.presentation.profile.ProfileFragment"
-        android:label="Perfil" />
-    <action
-        android:id="@+id/action_profileFragment_to_loginFragment"
-        app:destination="@id/loginFragment" />
-
+        android:label="Perfil"
+        tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/requestDetailFragment"
@@ -90,5 +99,4 @@
             android:name="requestId"
             app:argType="string" />
     </fragment>
-
 </navigation>

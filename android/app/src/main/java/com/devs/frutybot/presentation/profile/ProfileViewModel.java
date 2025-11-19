@@ -4,7 +4,6 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.devs.frutybot.data.local.UserSession;
@@ -13,9 +12,9 @@ public class ProfileViewModel extends AndroidViewModel {
 
     private final UserSession userSession;
 
-    public MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>();
-    public MutableLiveData<String> username = new MutableLiveData<>();
-    public MutableLiveData<String> profilePhoto = new MutableLiveData<>();
+    public final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>();
+    public final MutableLiveData<String> username = new MutableLiveData<>();
+    public final MutableLiveData<String> profilePhoto = new MutableLiveData<>();
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
@@ -23,7 +22,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
         // Inicializa los LiveData según sesión actual
         isLoggedIn.setValue(userSession.isLoggedIn());
-        username.setValue(userSession.getUsername());
+        username.setValue(userSession.getUsername() != null ? userSession.getUsername() : "Invitado");
         profilePhoto.setValue(userSession.getProfilePhoto());
     }
 
@@ -39,11 +38,13 @@ public class ProfileViewModel extends AndroidViewModel {
         profilePhoto.setValue(uri);
     }
 
-    // Login
+    // Login (recibe username; UserSession ya debe haber guardado datos)
     public void login(String username) {
+        // Si quieres, podrías recibir un UserDto y guardarlo completo en sesión
         userSession.saveLogin(username);
         this.username.setValue(username);
         isLoggedIn.setValue(true);
+        profilePhoto.setValue(userSession.getProfilePhoto());
     }
 
     // Logout
