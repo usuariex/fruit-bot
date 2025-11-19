@@ -1,7 +1,9 @@
 import { conexionbd } from "../db.js";
 import { v4 as uuidv4 } from "uuid";
 import { detectarFrutaConIA } from "../services/api_detector_ia.js";
-//import { notifyResult } from "../websocket/wsServer.js";
+import { config } from "../config.js";
+/* import { guardarResultBD } from "../repository/frutaRepo.js"; */
+import { notifyResult } from "../index.js";
 
 
 export const recibirImg = async (req, res) => {
@@ -14,18 +16,47 @@ export const recibirImg = async (req, res) => {
     }
 
     const requestId = uuidv4();
-      
+    console.log(`Imagen con requestId: ${requestId}, procesando...`);
+
+
     detectarFrutaConIA(file.path, text)
+
       .then(resultado => {
-        notifyResult(requestId, resultado);
+
+        console.log(requestId, {
+          id: resultado.id,
+          status: "done",
+          fruit: resultado.fruit
+        });
+
+
+
+        notifyResult(requestId, {
+          id: resultado.id,
+          status: "done",
+          fruit: resultado.fruit
+        });
+        /* guardarResultBD(resultado); */
       })
+
+
       .catch(err => {
-        notifyResult(requestId, { error: err.message });
-      }); 
+        notifyResult(requestId, {
+          status: "error",        
+          error: err.message
+        });
+      });
 
 
-    res.json({ message: "imagen recibida, procesando", requestId });
+    res.json({
+      message: "imagen recibida, procesando",
+      requestId,
+      status: "procesando",
+      imageUrl: config.baseUrlTemp + file.filename
+    });
+
   } catch (err) {
+
     res.status(500).json({ error: "Error del serividor", details: err.message });
   }
 };
@@ -57,7 +88,7 @@ export const listarFrutas = async (req, res) => {
 
 export const listarFrutasPorDepto = async (req, res) => {
   try {
-    const { depto } = req.query; 
+    const { depto } = req.query;
 
     if (!depto) {
       return res.status(400).json({ error: "Debe proporcionar el parámetro ?depto" });

@@ -9,12 +9,12 @@ const ruta = path.resolve(__dirname, '../../public/images_android/temp/capture.j
 
 async function miFunction() {
     try {
-        console.log("Iniciando prueba de detección...");
-        const resultado = await detectarFrutaConIA(ruta, "mangolango");
-        console.log("Prueba finalizada. Resultado:");
+        console.log("Iniciando detección...");
+        const resultado = await detectarFrutaConIA(ruta, "fruta tropical");
+        console.log("Resultado:");
         console.log(resultado);
     } catch (error) {
-        console.error("Error durante la ejecución de la prueba:", error);
+        console.error("Error:", error);
     }
 }
 
