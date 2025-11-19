@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar WebSocket global
         wsManager = new WsManager();
-        wsManager.connect("ws://"+ Config.BASE_URL_WS +":3020/ws");
+        wsManager.connect("ws://"+ Config.BASE_URL +":3020/ws");
 
         // Referencia al Toolbar superior
         MaterialToolbar toolbar = findViewById(R.id.top_app_bar);

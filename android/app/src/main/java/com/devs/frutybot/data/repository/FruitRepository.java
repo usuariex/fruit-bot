@@ -46,7 +46,7 @@ public class FruitRepository {
 
 
 
-    public void uploadPhoto(File photo, String text, final RepositoryCallback<String> callback) {
+    public void uploadPhoto(File photo, String text, final RepositoryCallback<UploadResponse> callback) {
         RequestBody requestFile = RequestBody.create(
                 okhttp3.MediaType.parse("image/jpeg"),
                 photo
@@ -62,10 +62,8 @@ public class FruitRepository {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    String requestId = response.body().getRequestId();
-                    callback.onSuccess(requestId);
-
-
+                    // 👈 devolvemos el objeto completo con message, requestId, status, imageUrl
+                    callback.onSuccess(response.body());
                 } else {
                     callback.onError(new Throwable("Error en la respuesta: " + response.code()));
                 }
@@ -77,6 +75,7 @@ public class FruitRepository {
             }
         });
     }
+
 
 
 

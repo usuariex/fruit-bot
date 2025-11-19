@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { detectarFrutaConIA } from "../services/api_detector_ia.js";
 import { config } from "../config.js";
 /* import { guardarResultBD } from "../repository/frutaRepo.js"; */
-import { notifyResult } from "../services/wsServer.js";
+import { notifyResult } from "../index.js";
 
 
 export const recibirImg = async (req, res) => {
@@ -25,7 +25,7 @@ export const recibirImg = async (req, res) => {
 
         console.log(requestId, {
           id: resultado.id,
-        
+          status: "done",
           fruit: resultado.fruit
         });
 
@@ -33,6 +33,7 @@ export const recibirImg = async (req, res) => {
 
         notifyResult(requestId, {
           id: resultado.id,
+          status: "done",
           fruit: resultado.fruit
         });
         /* guardarResultBD(resultado); */
@@ -40,17 +41,22 @@ export const recibirImg = async (req, res) => {
 
 
       .catch(err => {
-        notifyResult(requestId, { error: err.message });
+        notifyResult(requestId, {
+          status: "error",        
+          error: err.message
+        });
       });
 
 
     res.json({
       message: "imagen recibida, procesando",
       requestId,
+      status: "procesando",
       imageUrl: config.baseUrlTemp + file.filename
     });
 
   } catch (err) {
+
     res.status(500).json({ error: "Error del serividor", details: err.message });
   }
 };

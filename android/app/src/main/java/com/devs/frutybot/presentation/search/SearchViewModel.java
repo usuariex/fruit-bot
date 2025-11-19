@@ -34,7 +34,7 @@ public class SearchViewModel extends ViewModel {
                             List<Fruit> list = new ArrayList<>();
                             for (FruitDto dto : response.body()) {
                                 // Usamos id ficticio 0 para cumplir el constructor de Fruit
-                                list.add(new Fruit(0, dto.getNombre(), dto.getDescripcion(), dto.getImagen()));
+
                             }
                             _fruits.postValue(list);
                         }

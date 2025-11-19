@@ -47,6 +47,7 @@ public class SearchFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.fruits.observe(getViewLifecycleOwner(), adapter::setFrutas);
 
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}

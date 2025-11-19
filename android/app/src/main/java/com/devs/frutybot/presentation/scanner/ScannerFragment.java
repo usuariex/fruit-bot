@@ -30,11 +30,12 @@ import androidx.navigation.Navigation;
 import com.devs.frutybot.MainActivity;
 import com.devs.frutybot.NotificationsViewModel;
 import com.devs.frutybot.R;
+import com.devs.frutybot.data.dto.FruitDto;
 import com.devs.frutybot.data.dto.RequestItemDto;
-import com.devs.frutybot.data.util.RepositoryCallback;
 import com.devs.frutybot.data.ws.WsManager;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,38 +67,50 @@ public class ScannerFragment extends Fragment {
 
         // ViewModel propio del scanner
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
-        viewModel.getFruitInfo().observe(getViewLifecycleOwner(), requestId -> {
-            if (requestId != null && !requestId.startsWith("Error")) {
-                // Guardar solicitud en lista
-                RequestItemDto item = new RequestItemDto(requestId, "Procesando", /* aquí puedes guardar la ruta de la foto */ null);
+        viewModel.getFruitInfo().observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.getRequestId() != null) {
+                // Crear RequestItemDto inicial con datos del UploadResponse
+                RequestItemDto item = new RequestItemDto(
+                        response.getRequestId(),
+                        response.getStatus() != null ? response.getStatus() : "Procesando",
+                        response.getImageUrl() // 👈 miniatura si el backend la envía
+                );
                 notificationsViewModel.addRequest(item);
 
-                // Suscribirse al WebSocket
+                // Suscribirse al WebSocket usando el requestId
                 WsManager wsManager = ((MainActivity) requireActivity()).getWsManager();
-                wsManager.subscribe(requestId, new WsManager.WsCallback() {
+                wsManager.subscribe(response.getRequestId(), new WsManager.WsCallback() {
                     @Override
                     public void onResult(String requestId, String json) {
                         try {
                             JSONObject obj = new JSONObject(json);
-                            JSONObject result = obj.getJSONObject("result");
-                            String fruta = result.getString("fruta");
-                            String departamento = result.getString("departamento");
+                            String status = obj.optString("status");
 
-                            notificationsViewModel.updateRequest(requestId, "Listo", fruta, departamento);
+                            if ("done".equals(status)) {
+                                JSONObject fruitObj = obj.getJSONObject("fruit");
+                                FruitDto fruit = new Gson().fromJson(fruitObj.toString(), FruitDto.class);
+
+                                notificationsViewModel.updateRequest(requestId, "Listo", fruit);
+                            } else if ("error".equals(status)) {
+                                String errorMsg = obj.optString("error");
+                                notificationsViewModel.updateRequest(requestId, "Error", null);
+                                Toast.makeText(requireContext(), "Error: " + errorMsg, Toast.LENGTH_SHORT).show();
+                            }
                         } catch (JSONException e) {
-                            notificationsViewModel.updateRequest(requestId, "Error", null, null);
+                            notificationsViewModel.updateRequest(requestId, "Error", null);
                         }
                     }
 
                     @Override
                     public void onError(String requestId, String error) {
-                        notificationsViewModel.updateRequest(requestId, "Error", null, null);
+                        notificationsViewModel.updateRequest(requestId, "Error", null);
                     }
                 });
             } else {
-                Toast.makeText(requireContext(), requestId, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error al subir la foto", Toast.LENGTH_SHORT).show();
             }
         });
+
 
 
 
