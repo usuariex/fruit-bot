@@ -6,19 +6,34 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.devs.frutybot.data.dto.FruitDto;
+import com.devs.frutybot.data.dto.FruitDtoResponse;
 import com.devs.frutybot.data.dto.RequestItemDto;
+import com.devs.frutybot.data.ws.WsManager;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class NotificationsViewModel extends ViewModel {
     private final MutableLiveData<List<RequestItemDto>> requests = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> selectedRequestId = new MutableLiveData<>();
-
-    // MediatorLiveData que emite el RequestItemDto correcto cuando cambian requests o selectedRequestId
     private final MediatorLiveData<RequestItemDto> selectedRequest = new MediatorLiveData<>();
+    
+    private final WsManager wsManager;
+    private final Gson gson = new Gson();
 
-    public NotificationsViewModel() {
+    @Inject
+    public NotificationsViewModel(WsManager wsManager) {
+        this.wsManager = wsManager;
+        
         selectedRequest.addSource(requests, list -> updateSelectedRequest());
         selectedRequest.addSource(selectedRequestId, id -> updateSelectedRequest());
     }
@@ -39,30 +54,28 @@ public class NotificationsViewModel extends ViewModel {
         selectedRequest.setValue(null);
     }
 
-    // Exponer la lista completa para renderizar las notificaciones
     public LiveData<List<RequestItemDto>> getRequests() {
         return requests;
     }
 
-    // Exponer el item seleccionado (detalle)
     public LiveData<RequestItemDto> getSelectedRequest() {
         return selectedRequest;
     }
 
-    // Seleccionar un request para detalle
     public void selectRequest(String requestId) {
         selectedRequestId.setValue(requestId);
     }
 
-    // Agregar una nueva notificación en estado inicial (Procesando)
     public void addRequest(RequestItemDto item) {
         List<RequestItemDto> current = new ArrayList<>();
         if (requests.getValue() != null) current.addAll(requests.getValue());
         current.add(item);
         requests.setValue(current);
+        
+        // Iniciar escucha automática para este request
+        listenForUpdates(item.getRequestId());
     }
 
-    // Actualizar estado y fruta cuando llega el resultado por WS (Listo o Error)
     public void updateRequest(String requestId, String status, FruitDto fruit) {
         List<RequestItemDto> current = new ArrayList<>();
         if (requests.getValue() != null) current.addAll(requests.getValue());
@@ -70,14 +83,44 @@ public class NotificationsViewModel extends ViewModel {
         for (RequestItemDto item : current) {
             if (item.getRequestId().equals(requestId)) {
                 item.setStatus(status);
-                item.setFruit(fruit);
+                if (fruit != null) {
+                    item.setFruit(fruit);
+                }
                 changed = true;
                 break;
             }
         }
         if (changed) {
-            requests.setValue(current); // disparará observers y recalculará selectedRequest
+            requests.postValue(current); 
         }
+    }
+    
+    private void listenForUpdates(String requestId) {
+        wsManager.subscribe(requestId, new WsManager.WsCallback() {
+            @Override
+            public void onResult(String requestId, String json) {
+                try {
+                    // Parsear usando FruitDtoResponse que envuelve todo
+                    FruitDtoResponse response = gson.fromJson(json, FruitDtoResponse.class);
+                    String status = response.getStatus();
+
+                    if ("done".equals(status)) {
+                        updateRequest(requestId, "Listo", response.getFruit());
+                        // Opcional: desuscribirse si ya terminó
+                        // wsManager.unsubscribe(requestId); 
+                    } else if ("error".equals(status)) {
+                        updateRequest(requestId, "Error", null);
+                    }
+                } catch (Exception e) {
+                    updateRequest(requestId, "Error", null);
+                }
+            }
+
+            @Override
+            public void onError(String requestId, String error) {
+                updateRequest(requestId, "Error", null);
+            }
+        });
     }
 
     public int getRequestsCount() {

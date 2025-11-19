@@ -2,7 +2,6 @@ package com.devs.frutybot.data.repository;
 
 import com.devs.frutybot.data.dto.Fruit;
 import com.devs.frutybot.data.dto.UploadResponseStart;
-import com.devs.frutybot.data.remote.ApiClient;
 import com.devs.frutybot.data.remote.ApiService;
 import com.devs.frutybot.data.mapper.FruitMapper;
 import com.devs.frutybot.data.util.RepositoryCallback;
@@ -10,6 +9,8 @@ import com.devs.frutybot.domain.model.FruitDomain;
 
 import java.io.File;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -19,9 +20,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FruitRepository {
-    private final ApiService apiService = ApiClient.getApiService();
+    private final ApiService apiService;
 
-    // Método para obtener frutas por departamento (usa DTO Fruit y lo convierte a FruitDomain)
+    @Inject
+    public FruitRepository(ApiService apiService) {
+        this.apiService = apiService;
+    }
+
+    public FruitRepository() {
+        // Constructor vacío para compatibilidad temporal si algo no usa DI aun,
+        // pero idealmente deberíamos usar inyección.
+        // Por ahora lo dejaremos como fallback llamando a ApiClient antiguo o null
+        // PERO mejor eliminamos dependencia de ApiClient estático para forzar DI.
+        this.apiService = com.devs.frutybot.data.remote.ApiClient.getApiService();
+    }
+
+    // Método para obtener frutas por departamento
     public void getFruitsByDepartment(String depto, final RepositoryCallback<List<FruitDomain>> callback) {
         apiService.getFruitsByDepartment(depto).enqueue(new Callback<List<Fruit>>() {
             @Override
@@ -89,6 +103,4 @@ public class FruitRepository {
             }
         });
     }
-
-
 }

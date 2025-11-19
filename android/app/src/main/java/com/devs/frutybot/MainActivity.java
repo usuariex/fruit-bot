@@ -11,7 +11,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import com.devs.frutybot.common.Config;
 import com.devs.frutybot.data.local.UserSession;
 import com.devs.frutybot.data.ws.WsManager;
 import com.devs.frutybot.presentation.notifications.NotificationsDialogFragment;
@@ -21,12 +20,17 @@ import com.google.android.material.badge.BadgeUtils;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 @ExperimentalBadgeUtils
 public class MainActivity extends AppCompatActivity {
-    private WsManager wsManager;
+
+    @Inject
+    WsManager wsManager;
+
     private BadgeDrawable notificationBadge;
     private MaterialToolbar toolbar;
 
@@ -37,9 +41,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inicializar WebSocket global (puedes cambiar a lazy/DI si lo prefieres)
-        wsManager = new WsManager();
-        wsManager.connect("ws://" + Config.BASE_URL + ":3020/ws");
+        // wsManager ya está inyectado y conectado en AppModule
+        // (o puedes llamar a connect aquí si prefieres manejar el ciclo de vida manual)
+        // wsManager.connect(...) ya se llamó en AppModule si así se configuró,
+        // o si no, lo conectamos aquí usando config inyectada.
+        // Asumiendo que AppModule lo configuró:
+        // wsManager.connect("ws://" + Config.BASE_URL + ":3020/ws"); <-- Esto ahora lo maneja DI preferiblemente
 
         // Toolbar
         toolbar = findViewById(R.id.top_app_bar);
@@ -140,29 +147,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        // Limpiar badge
         if (notificationBadge != null && toolbar != null) {
             try {
                 BadgeUtils.detachBadgeDrawable(notificationBadge, toolbar, R.id.action_notifications);
             } catch (Exception ignored) {}
             notificationBadge = null;
         }
-
-        // Cerrar WebSocket
+        
+        // Dejamos que DI maneje el lifecycle de wsManager singleton o lo cerramos si es necesario
         if (wsManager != null) {
-            try {
-                wsManager.disconnect();
-            } catch (Exception ignored) {}
-            wsManager = null;
+            wsManager.disconnect();
         }
     }
-
-    /**
-     * Devuelve la instancia actual de WsManager (puede ser null si no fue inicializado).
-     * Para mayor robustez considera inicializar de forma lazy o inyectarla con Hilt.
-     */
+    
     public WsManager getWsManager() {
         return wsManager;
     }
 }
-

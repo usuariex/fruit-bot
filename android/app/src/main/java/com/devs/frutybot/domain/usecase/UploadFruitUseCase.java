@@ -6,9 +6,12 @@ import com.devs.frutybot.data.util.RepositoryCallback;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 public class UploadFruitUseCase {
     private final FruitRepository repository;
 
+    @Inject
     public UploadFruitUseCase(FruitRepository repository) {
         this.repository = repository;
     }

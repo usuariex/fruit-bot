@@ -18,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.devs.frutybot.R;
 import com.devs.frutybot.presentation.adapters.FruitAdapter;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SearchFragment extends Fragment {
 
     private EditText etSearch;

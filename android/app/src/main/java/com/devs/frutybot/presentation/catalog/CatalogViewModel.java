@@ -10,11 +10,21 @@ import com.devs.frutybot.domain.model.FruitDomain;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class CatalogViewModel extends ViewModel {
     // Ahora usamos FruitDomain en lugar de Fruit
     private final MutableLiveData<List<FruitDomain>> frutas = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
-    private final FruitRepository repository = new FruitRepository();
+    private final FruitRepository repository;
+
+    @Inject
+    public CatalogViewModel(FruitRepository repository) {
+        this.repository = repository;
+    }
 
     public LiveData<List<FruitDomain>> getFrutas() {
         return frutas;
