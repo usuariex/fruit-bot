@@ -1,10 +1,11 @@
 package com.devs.frutybot;
 
 import android.os.Bundle;
-import android.view.View;
+import android.view.MenuItem;
 
-import androidx.annotation.OptIn;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -12,7 +13,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.devs.frutybot.common.Config;
 import com.devs.frutybot.data.local.UserSession;
-
 import com.devs.frutybot.data.ws.WsManager;
 import com.devs.frutybot.presentation.notifications.NotificationsDialogFragment;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -24,79 +24,145 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
+@ExperimentalBadgeUtils
 public class MainActivity extends AppCompatActivity {
     private WsManager wsManager;
+    private BadgeDrawable notificationBadge;
+    private MaterialToolbar toolbar;
 
-    @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        androidx.core.splashscreen.SplashScreen splashScreen =
-                androidx.core.splashscreen.SplashScreen.installSplashScreen(this);
+    @ExperimentalBadgeUtils
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inicializar WebSocket global
+        // Inicializar WebSocket global (puedes cambiar a lazy/DI si lo prefieres)
         wsManager = new WsManager();
-        wsManager.connect("ws://"+ Config.BASE_URL +":3020/ws");
+        wsManager.connect("ws://" + Config.BASE_URL + ":3020/ws");
 
-        // Referencia al Toolbar superior
-        MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
+        // Toolbar
+        toolbar = findViewById(R.id.top_app_bar);
+        if (toolbar != null) {
+            toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_notifications) {
+                    NotificationsDialogFragment dialog = new NotificationsDialogFragment();
+                    if (!getSupportFragmentManager().isStateSaved()) {
+                        dialog.show(getSupportFragmentManager(), "NotificationsDialog");
+                    } else {
+                        getSupportFragmentManager().beginTransaction()
+                                .add(dialog, "NotificationsDialog")
+                                .commitAllowingStateLoss();
+                    }
+                    return true;
+                }
+                return false;
+            });
+        }
 
-        // Listener para clicks en el menú del Toolbar
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_notifications) {
-                NotificationsDialogFragment dialog = new NotificationsDialogFragment();
-                dialog.show(getSupportFragmentManager(), "NotificationsDialog");
-                return true;
-            }
-            return false;
-        });
+        // NavController
+        NavHostFragment navHostFragment =
+                (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (navHostFragment == null) return;
+        NavController navController = navHostFragment.getNavController();
 
+        // Bottom navigation
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
+        NavigationUI.setupWithNavController(bottomNav, navController);
 
-        // ViewModel compartido para notificaciones
+        // Notifications ViewModel
         NotificationsViewModel notificationsViewModel =
                 new ViewModelProvider(this).get(NotificationsViewModel.class);
 
-        // Observar solicitudes y actualizar badge en la campanita
+        // Observe requests -> update badge
         notificationsViewModel.getRequests().observe(this, requests -> {
-            BadgeDrawable badge = BadgeDrawable.create(this);
-            badge.setNumber(requests.size());
-            badge.setVisible(true);
+            try {
+                if (requests == null || requests.isEmpty()) {
+                    if (notificationBadge != null && toolbar != null) {
+                        try {
+                            BadgeUtils.detachBadgeDrawable(notificationBadge, toolbar, R.id.action_notifications);
+                        } catch (Exception ignored) {}
+                        notificationBadge = null;
+                    }
+                    return;
+                }
 
-            // Adjuntar badge al ítem de la campanita del Toolbar
-            BadgeUtils.attachBadgeDrawable(badge, toolbar, R.id.action_notifications);
+                if (notificationBadge == null) {
+                    notificationBadge = BadgeDrawable.create(this);
+                }
+
+                notificationBadge.setNumber(requests.size());
+                notificationBadge.setVisible(true);
+
+                if (toolbar != null) {
+                    try {
+                        BadgeUtils.attachBadgeDrawable(notificationBadge, toolbar, R.id.action_notifications);
+                    } catch (Exception ignored) {}
+                }
+            } catch (Exception ignored) {}
         });
 
-        // Configurar navegación inferior
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
+        // Session-aware navigation for profile
         UserSession session = new UserSession(this);
-
         bottomNav.setOnItemSelectedListener(item -> {
-
             if (item.getItemId() == R.id.profileFragment) {
-
                 if (session.isLoggedIn()) {
                     navController.navigate(R.id.profileFragment);
                 } else {
                     navController.navigate(R.id.loginFragment);
                 }
-
                 return true;
             }
-
-            return NavigationUI.onNavDestinationSelected(item, navController)
-                    || super.onOptionsItemSelected(item);
+            return NavigationUI.onNavDestinationSelected(item, navController);
         });
 
+        // Show/hide bottom nav and notification menu item per destination
+        navController.addOnDestinationChangedListener((controller, destination, args) -> {
+            int destId = destination.getId();
+            boolean showBottom = (destId == R.id.homeFragment
+                    || destId == R.id.searchFragment
+                    || destId == R.id.scannerFragment);
 
-        NavigationUI.setupWithNavController(bottomNav, navController);
+            if (bottomNav != null) bottomNav.setVisibility(showBottom ? android.view.View.VISIBLE : android.view.View.GONE);
+
+            // Show/hide menu item safely
+            if (toolbar != null) {
+                MenuItem notifItem = toolbar.getMenu() != null ? toolbar.getMenu().findItem(R.id.action_notifications) : null;
+                if (notifItem != null) {
+                    notifItem.setVisible(showBottom);
+                }
+            }
+        });
     }
 
+    @Override
+    @ExperimentalBadgeUtils
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Limpiar badge
+        if (notificationBadge != null && toolbar != null) {
+            try {
+                BadgeUtils.detachBadgeDrawable(notificationBadge, toolbar, R.id.action_notifications);
+            } catch (Exception ignored) {}
+            notificationBadge = null;
+        }
+
+        // Cerrar WebSocket
+        if (wsManager != null) {
+            try {
+                wsManager.disconnect();
+            } catch (Exception ignored) {}
+            wsManager = null;
+        }
+    }
+
+    /**
+     * Devuelve la instancia actual de WsManager (puede ser null si no fue inicializado).
+     * Para mayor robustez considera inicializar de forma lazy o inyectarla con Hilt.
+     */
     public WsManager getWsManager() {
         return wsManager;
     }
-
 }
+

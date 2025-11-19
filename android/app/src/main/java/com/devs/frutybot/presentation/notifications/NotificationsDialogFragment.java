@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,26 +22,18 @@ import com.devs.frutybot.presentation.adapters.NotificationsAdapter;
 public class NotificationsDialogFragment extends DialogFragment {
 
     private NotificationsViewModel notificationsViewModel;
+    private NotificationsAdapter adapter;
 
-    @Nullable
+    @NonNull
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
-        // RecyclerView para la lista
-        RecyclerView recyclerView = new RecyclerView(requireContext());
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        View content = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_notifications_container, null);
+        RecyclerView recyclerView = content.findViewById(R.id.recyclerNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // ViewModel compartido con la Activity (donde vive el NavHost)
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-
-        // NavController desde el NavHostFragment de la Activity
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-
-        // Adapter con callback de click: navega al detalle y cierra el diálogo
-        NotificationsAdapter adapter = new NotificationsAdapter(item -> {
+        adapter = new NotificationsAdapter(item -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
             Bundle args = new Bundle();
             args.putString("requestId", item.getRequestId());
             navController.navigate(R.id.requestDetailFragment, args);
@@ -50,17 +41,11 @@ public class NotificationsDialogFragment extends DialogFragment {
         });
         recyclerView.setAdapter(adapter);
 
-        // Observar la lista de solicitudes y renderizar
-        notificationsViewModel.getRequests().observe(getViewLifecycleOwner(), adapter::submitList);
+        // ViewModel compartido con la Activity
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        // Observa la lista usando el DialogFragment como LifecycleOwner (this)
+        notificationsViewModel.getRequests().observe(this, adapter::submitList);
 
-        return recyclerView;
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Usa la vista creada arriba como contenido del diálogo
-        View content = onCreateView(getLayoutInflater(), null, savedInstanceState);
         return new AlertDialog.Builder(requireContext())
                 .setTitle("Solicitudes")
                 .setView(content)
@@ -68,4 +53,3 @@ public class NotificationsDialogFragment extends DialogFragment {
                 .create();
     }
 }
-
