@@ -20,6 +20,8 @@ import androidx.navigation.Navigation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.devs.frutybot.R;
+import android.speech.tts.TextToSpeech;
+import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
@@ -33,6 +35,15 @@ public class ProfileFragment extends Fragment {
     FloatingActionButton btnChangePhoto;
 
     ActivityResultLauncher<Intent> galleryLauncher;
+    private TextToSpeech tts;
+    private Button btnPlayChorus;
+
+    // ⚠️ AQUÍ PEGAS TÚ MISMO EL CORO
+    private String chorusText = "Hey, I just met you\n" +
+            "And this is crazy\n" +
+            "But here's my number\n" +
+            "So call me, maybe";
+
 
     @Nullable
     @Override
@@ -87,6 +98,21 @@ public class ProfileFragment extends Fragment {
         });
 
         btnLogout.setOnClickListener(v -> viewModel.logout());
+        btnPlayChorus = view.findViewById(R.id.btnPlayChorus);
+
+        tts = new TextToSpeech(requireContext(), status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                tts.setLanguage(Locale.getDefault()); // español si el móvil está en español
+                tts.setPitch(1.0f);
+                tts.setSpeechRate(1.0f);
+            }
+        });
+        btnPlayChorus.setOnClickListener(v -> {
+            if (tts != null) {
+                tts.speak(chorusText, TextToSpeech.QUEUE_FLUSH, null, "chorusID");
+            }
+        });
+
     }
 
     private void setupGalleryPicker() {
@@ -136,4 +162,13 @@ public class ProfileFragment extends Fragment {
         });
 
     }
+    @Override
+    public void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
 }

@@ -6,5 +6,5 @@ public class Config {
 
     /*public static final String BASE_URL = "http://192.168.100.176:3020";*/
 
-    public static final String BASE_URL = "http://192.168.100.6:3020";
+    public static final String BASE_URL = "http://172.17.2.28:3020";
 }
