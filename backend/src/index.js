@@ -8,6 +8,8 @@ import { config } from "./config.js";
 import frutaRoutes from './routes/frutaRoutes.js';
 import pruevaServer from './routes/pruevaServer.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
