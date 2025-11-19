@@ -1,10 +1,24 @@
 package com.devs.frutybot;
-
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -12,20 +26,33 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.devs.frutybot.common.Config;
 import com.devs.frutybot.data.local.UserSession;
-
 import com.devs.frutybot.data.ws.WsManager;
 import com.devs.frutybot.presentation.notifications.NotificationsDialogFragment;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.List;
+import java.util.Locale;
+
 import dagger.hilt.android.AndroidEntryPoint;
+
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
     private WsManager wsManager;
+    private static final int REQ_PERM_LOCATION = 1001;
+    private FusedLocationProviderClient fusedLocationClient;
+
 
     @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
@@ -93,10 +120,70 @@ public class MainActivity extends AppCompatActivity {
 
 
         NavigationUI.setupWithNavController(bottomNav, navController);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+// Obtener ubicación automáticamente al iniciar
+        if (checkLocationPermission()) {
+            getLastLocation();
+        } else {
+            requestLocationPermission();
+        }
+
     }
 
     public WsManager getWsManager() {
         return wsManager;
+    }
+    private boolean checkLocationPermission() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                REQ_PERM_LOCATION);
+    }
+
+    public void getLastLocation() {
+        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (lm != null && !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) return;
+
+        try {
+            LocationRequest locationRequest = LocationRequest.create()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(0)
+                    .setFastestInterval(0)
+                    .setNumUpdates(1);
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) return;
+
+            fusedLocationClient.requestLocationUpdates(locationRequest, new com.google.android.gms.location.LocationCallback() {
+                @Override
+                public void onLocationResult(@NonNull com.google.android.gms.location.LocationResult locationResult) {
+                    fusedLocationClient.removeLocationUpdates(this);
+                    if (locationResult.getLastLocation() != null) {
+                        Location location = locationResult.getLastLocation();
+                        // Aquí puedes usar location.getLatitude() y location.getLongitude()
+                        // por ejemplo para enviar al servidor o guardar localmente
+                    }
+                }
+            }, getMainLooper());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_PERM_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLastLocation();
+            }
+        }
     }
 
 }

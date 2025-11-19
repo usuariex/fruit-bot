@@ -11,4 +11,9 @@ public class Department {
 
     public String getName() { return name; }
     public String getImageUrl() { return imageUrl; }
+    private boolean highlighted = false;
+
+    public boolean isHighlighted() { return highlighted; }
+    public void setHighlighted(boolean value) { highlighted = value; }
+
 }
