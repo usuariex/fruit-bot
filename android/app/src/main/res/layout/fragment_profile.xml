@@ -115,7 +115,6 @@
         app:strokeColor="#8B4513"
         app:strokeWidth="4dp"
         app:backgroundTint="#A7E673"
-        app:icon="@android:drawable/ic_menu_close_clear_cancel"
         app:iconTint="#000000"
         app:iconGravity="textStart"
         app:iconPadding="12dp" />

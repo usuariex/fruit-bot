@@ -40,6 +40,8 @@ public class HomeFragment extends Fragment {
     private List<Department> listDepartments;
     private DepartmentAdapter adapter;
     private String mi_ip_local = Config.BASE_URL;
+    private Location pendingLocation;
+
 
     // Coordenadas aproximadas de cada departamento (lat, lng)
     // Solo ejemplo: reemplaza con coordenadas reales si quieres precisión
@@ -163,7 +165,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void highlightDepartment(Location loc) {
-        // Encuentra el departamento más cercano
+        // 1️⃣ Asegúrate de que la vista está inflada
+        if (!isAdded() || getView() == null) return;
+
+        // 2️⃣ Encuentra el departamento más cercano
         double minDistance = Double.MAX_VALUE;
         int closestIndex = 0;
 
@@ -178,18 +183,25 @@ public class HomeFragment extends Fragment {
             }
         }
 
+        // 3️⃣ Actualiza la UI de los departamentos
         for (int i = 0; i < listDepartments.size(); i++) {
             listDepartments.get(i).setHighlighted(i == closestIndex);
         }
 
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
 
-        // Redirigir al catálogo del departamento más cercano
-        Bundle args = new Bundle();
-        args.putString("department", listDepartments.get(closestIndex).getName());
-        Navigation.findNavController(requireView())
-                .navigate(R.id.action_homeFragment_to_catalogFragment, args);
+        // 4️⃣ Redirige al catálogo solo si NavController existe
+        View view = getView();
+        if (view != null) {
+            Bundle args = new Bundle();
+            args.putString("department", listDepartments.get(closestIndex).getName());
+            Navigation.findNavController(view)
+                    .navigate(R.id.action_homeFragment_to_catalogFragment, args);
+        }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
