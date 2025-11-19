@@ -80,3 +80,42 @@ export const getLogDistribution = async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+// Devuelve el consumo de tokens por día del último mes.
+export const getTokenUsageByDay = async (req, res) => {
+  try {
+    const [rows] = await conexionbd.query(`
+      SELECT 
+        DATE(created_at) as dia, 
+        SUM(input) as total_input,
+        SUM(output) as total_output
+      FROM tokens
+      -- WHERE YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW()) -- Comentamos el filtro para depurar
+      GROUP BY dia
+      ORDER BY dia ASC;
+    `);
+    // Ya no es necesario formatear, enviamos los datos directamente.
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Error al obtener el consumo de tokens:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+// Devuelve el resumen total de tokens (input/output) del mes actual.
+export const getCurrentMonthTokenSummary = async (req, res) => {
+  try {
+    const [rows] = await conexionbd.query(`
+      SELECT 
+        SUM(input) as total_input,
+        SUM(output) as total_output
+      FROM tokens
+      -- WHERE YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW()); -- Comentamos el filtro para depurar
+    `);
+    // Devolvemos el primer (y único) objeto del array, o ceros si no hay datos.
+    res.status(200).json(rows[0] || { total_input: 0, total_output: 0 });
+  } catch (error) {
+    console.error("Error al obtener el resumen de tokens:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};

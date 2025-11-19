@@ -78,8 +78,6 @@ export const detectarFrutaConIA = async (imagePath, pista) => {
   return {
     id: response.id,
     status: response.status,
-    model: response.model,
-    schema: response.text.format.schema,
     output_text: response.output_text,
     fruit: response.output_parsed,
     tokens: {
