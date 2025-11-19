@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.devs.frutybot.R;
 import com.devs.frutybot.presentation.adapters.FruitAdapter;
+import android.widget.ImageButton;
 
 
 public class CatalogFragment extends Fragment {
@@ -33,6 +34,8 @@ public class CatalogFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ImageButton btnBack = view.findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
         RecyclerView recyclerView = view.findViewById(R.id.rvCatalog);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new FruitAdapter();

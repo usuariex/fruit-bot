@@ -82,3 +82,33 @@ export const listarFrutasPorDepto = async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+export const buscarFrutas = async (req, res) => {
+  try {
+    const { nombre } = req.query;
+
+    if (!nombre || nombre.trim() === "") {
+      return res.json([]); // Si no envían texto, devolvemos vacío
+    }
+
+    const query = `
+      SELECT 
+        f.FRUTA_ID,
+        f.NOMBRE,
+        f.URL_IMG,
+        f.DESCRIPCION,
+        d.NOMBRE AS departamento_nombre,
+        d.DESCRIPCION AS departamento_descripcion
+      FROM fruta f
+      INNER JOIN departamento d ON f.DEPT_ID = d.DEPT_ID
+      WHERE f.NOMBRE LIKE ?
+    `;
+
+    const [rows] = await conexionbd.query(query, [`%${nombre}%`]);
+
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Error al buscar frutas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+

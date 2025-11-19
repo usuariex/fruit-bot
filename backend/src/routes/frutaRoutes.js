@@ -2,8 +2,8 @@ import { Router } from 'express';
 import {
     listarFrutas,
     listarFrutasPorDepto,
-    recibirImg
-
+    recibirImg,
+    buscarFrutas                
 } from '../controllers/frutaController.js';
 import multer from 'multer';
 import path from 'path';
@@ -31,6 +31,8 @@ const upload = multer({ storage });
 router.get('/', listarFrutas)
 router.get('/depto', listarFrutasPorDepto)
 router.post("/recibirImg", upload.single("file"), recibirImg);
+router.get("/buscar", buscarFrutas);
+
 
 
 export default router;
