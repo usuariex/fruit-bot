@@ -8,6 +8,7 @@ dotenv.config();
 
 const apiKey = process.env.API_KEY;
 const modelo = process.env.MODEL;
+
 const client = new OpenAI({ apiKey });
 
 // Esquema con Zod
@@ -67,5 +68,22 @@ export const detectarFrutaConIA = async (imagePath, pista) => {
     },
   });
 
-  return response.output_parsed;
+
+
+ /*  return response;
+ */
+
+  return {
+    id: response.id,
+    status: response.status,
+    model: response.model,
+    schema: response.text.format.schema,
+    output_text: response.output_text,
+    fruit: response.output_parsed,
+    tokens: {
+      input: response.usage.input_tokens,
+      output: response.usage.output_tokens,
+      total: response.usage.total_tokens
+    },
+  }
 };
