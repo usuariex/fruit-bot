@@ -37,22 +37,31 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Views
         etSearch = view.findViewById(R.id.etSearch);
         rvFruits = view.findViewById(R.id.rvFruits);
 
+        // RecyclerView + Adapter
         adapter = new FruitAdapter();
         rvFruits.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvFruits.setAdapter(adapter);
 
+        // ViewModel
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-        viewModel.fruits.observe(getViewLifecycleOwner(), adapter::setFrutas);
 
+        // Observer que actualiza el recyclerview
+        viewModel.fruits.observe(getViewLifecycleOwner(), fruits -> {
+            adapter.setFrutas(fruits); // Ya existe, no se duplica
+        });
+
+        // Listener del buscador
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                viewModel.fetchFruits(s.toString());
+                String query = s.toString().trim();
+                viewModel.fetchFruits(query); // ← hace la petición al endpoint /buscar
             }
         });
     }

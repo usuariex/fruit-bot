@@ -21,28 +21,33 @@ public class SearchViewModel extends ViewModel {
     public LiveData<List<Fruit>> fruits = _fruits;
 
     public void fetchFruits(String query) {
-        if (query.isEmpty()) {
+        if (query.trim().isEmpty()) {
             _fruits.postValue(new ArrayList<>());
             return;
         }
 
-        ApiClient.getApiService().getFruitsByDepartment(query)
+        ApiClient.getApiService().buscarFrutas(query)
                 .enqueue(new Callback<List<FruitDto>>() {
                     @Override
                     public void onResponse(Call<List<FruitDto>> call, Response<List<FruitDto>> response) {
                         if (response.isSuccessful() && response.body() != null) {
+
                             List<Fruit> list = new ArrayList<>();
                             for (FruitDto dto : response.body()) {
-                                // Usamos id ficticio 0 para cumplir el constructor de Fruit
-                                list.add(new Fruit(0, dto.getNombre(), dto.getDescripcion(), dto.getImagen()));
+                                list.add(new Fruit(
+                                        dto.getId(),     // Debe coincidir con tu DTO
+                                        dto.getNombre(),
+                                        dto.getImagen(),
+                                        dto.getDescripcion()
+                                ));
                             }
+
                             _fruits.postValue(list);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<List<FruitDto>> call, Throwable t) {
-                        // Puedes agregar un LiveData de error si quieres
                         _fruits.postValue(new ArrayList<>());
                     }
                 });

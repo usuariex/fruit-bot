@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import { z } from "zod";
@@ -6,7 +8,7 @@ import fs from "fs";
 
 dotenv.config();
 
-const apiKey = process.env.API_KEY;
+const apiKey = process.env.OPENAI_API_KEY;
 const modelo = process.env.MODEL;
 const client = new OpenAI({ apiKey });
 

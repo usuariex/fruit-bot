@@ -38,7 +38,7 @@
         android:theme="@style/Theme.FrutyBot" >
 
         <activity
-            android:name="com.devs.frutybot.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -28,12 +28,14 @@ public class MainActivity extends AppCompatActivity {
     @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        androidx.core.splashscreen.SplashScreen splashScreen =
+                androidx.core.splashscreen.SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // Inicializar WebSocket global
         wsManager = new WsManager();
-        wsManager.connect("ws://192.168.100.176:3020/ws");
+        wsManager.connect("ws://192.168.100.8:3020/ws");
 
         // Referencia al Toolbar superior
         MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
@@ -87,10 +89,12 @@ public class MainActivity extends AppCompatActivity {
                     || super.onOptionsItemSelected(item);
         });
 
+
         NavigationUI.setupWithNavController(bottomNav, navController);
     }
 
     public WsManager getWsManager() {
         return wsManager;
     }
+
 }
