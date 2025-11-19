@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.devs.frutybot.R;
 
@@ -26,9 +27,10 @@ public class ProfileFragment extends Fragment {
 
     ImageView imgProfile;
     TextView tvUsername;
-    Button btnLogin, btnEditName, btnSaveName, btnChangePhoto;
+    Button btnLogin, btnEditName, btnSaveName;
     EditText etNewName;
     Button btnLogout;
+    FloatingActionButton btnChangePhoto;
 
     ActivityResultLauncher<Intent> galleryLauncher;
 
@@ -58,11 +60,11 @@ public class ProfileFragment extends Fragment {
         btnLogout = view.findViewById(R.id.btnLogout);
 
         setupGalleryPicker();
-
         observeData();
 
         btnLogin.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_loginFragment)
+                Navigation.findNavController(v)
+                        .navigate(R.id.action_profileFragment_to_loginFragment)
         );
 
         btnEditName.setOnClickListener(v -> {
@@ -83,10 +85,8 @@ public class ProfileFragment extends Fragment {
             Intent pick = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             galleryLauncher.launch(pick);
         });
-        btnLogout.setOnClickListener(v -> {
-            viewModel.logout(); // Limpiamos sesión
-        });
 
+        btnLogout.setOnClickListener(v -> viewModel.logout());
     }
 
     private void setupGalleryPicker() {
@@ -117,43 +117,22 @@ public class ProfileFragment extends Fragment {
                 etNewName.setVisibility(View.GONE);
                 btnSaveName.setVisibility(View.GONE);
                 btnLogout.setVisibility(View.GONE);
-                tvUsername.setText("prueba");
+                tvUsername.setText("Invitado");
                 imgProfile.setImageResource(R.drawable.circle_background);
 
-                // Navegar automáticamente al login
                 Navigation.findNavController(requireView())
                         .navigate(R.id.action_profileFragment_to_loginFragment);
             }
         });
 
-
-        viewModel.username.observe(getViewLifecycleOwner(), name ->
-                tvUsername.setText(name)
-        );
+        viewModel.username.observe(getViewLifecycleOwner(),
+                name -> tvUsername.setText(name));
 
         viewModel.profilePhoto.observe(getViewLifecycleOwner(), uri -> {
             if (uri != null)
                 imgProfile.setImageURI(Uri.parse(uri));
             else
                 imgProfile.setImageResource(R.drawable.circle_background);
-        });
-        viewModel.isLoggedIn.observe(getViewLifecycleOwner(), loggedIn -> {
-            if (loggedIn) {
-                btnLogin.setVisibility(View.GONE);
-                btnEditName.setVisibility(View.VISIBLE);
-                btnChangePhoto.setVisibility(View.VISIBLE);
-                tvUsername.setVisibility(View.VISIBLE);
-                btnLogout.setVisibility(View.VISIBLE); // MOSTRAR botón logout
-            } else {
-                btnLogin.setVisibility(View.VISIBLE);
-                btnEditName.setVisibility(View.GONE);
-                btnChangePhoto.setVisibility(View.GONE);
-                etNewName.setVisibility(View.GONE);
-                btnSaveName.setVisibility(View.GONE);
-                btnLogout.setVisibility(View.GONE); // OCULTAR botón logout
-                tvUsername.setText("Invitado");
-                imgProfile.setImageResource(R.drawable.circle_background);
-            }
         });
 
     }

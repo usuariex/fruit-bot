@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@drawable/_025_11_12_171014"
     android:gravity="top|center_horizontal"
+    android:orientation="vertical"
     android:padding="40dp">
 
     <!-- Imagen de usuario genérica -->
@@ -26,28 +26,28 @@
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Usuario"
         android:background="@drawable/rounded_edittext"
+        android:hint="Usuario"
         android:padding="12dp" />
 
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contraseña"
-        android:inputType="textPassword"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_edittext"
+        android:hint="Contraseña"
+        android:inputType="textPassword"
         android:padding="12dp" />
 
     <EditText
         android:id="@+id/etConfirmPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Confirmar contraseña"
-        android:inputType="textPassword"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_edittext"
+        android:hint="Confirmar contraseña"
+        android:inputType="textPassword"
         android:padding="12dp" />
 
     <!-- Botones -->
@@ -55,13 +55,13 @@
         android:id="@+id/btnRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Registrar"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:text="Registrar" />
 
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Volver"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:text="Volver" />
 </LinearLayout>

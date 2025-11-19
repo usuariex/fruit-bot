@@ -2,22 +2,22 @@
 
     <item
         android:id="@+id/homeFragment"
-
+        android:icon="@drawable/ic_home"
         android:title="Home" />
 
     <item
         android:id="@+id/searchFragment"
-
+        android:icon="@drawable/ic_search"
         android:title="Search" />
 
     <item
         android:id="@+id/scannerFragment"
-
+        android:icon="@drawable/ic_camera"
         android:title="Scanner" />
 
     <item
         android:id="@+id/profileFragment"
-
+        android:icon="@drawable/ic_profile"
         android:title="Profile" />
 
 </menu>
