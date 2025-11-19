@@ -4,19 +4,34 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Toolbar (Contiene el menú de notificaciones a la derecha) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/top_app_bar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
+        android:elevation="4dp"
         app:title=""
         app:menu="@menu/top_app_bar_menu"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-
-
+    <!-- Título Centrado (Visualmente independiente del Toolbar) -->
+    <TextView
+        android:id="@+id/tvAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FrutyBot"
+        android:textSize="20sp"
+        android:textStyle="bold|italic"
+        android:textColor="@color/purple_500"
+        android:fontFamily="sans-serif-medium"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/top_app_bar"
+        app:layout_constraintTop_toTopOf="@id/top_app_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
@@ -30,7 +45,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:startDestination="@id/splashFragment"/>
-
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"

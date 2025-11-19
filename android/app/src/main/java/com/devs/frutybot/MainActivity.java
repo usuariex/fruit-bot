@@ -11,6 +11,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.devs.frutybot.common.Config;
 import com.devs.frutybot.data.local.UserSession;
 import com.devs.frutybot.data.ws.WsManager;
 import com.devs.frutybot.presentation.notifications.NotificationsDialogFragment;
@@ -40,13 +41,6 @@ public class MainActivity extends AppCompatActivity {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // wsManager ya está inyectado y conectado en AppModule
-        // (o puedes llamar a connect aquí si prefieres manejar el ciclo de vida manual)
-        // wsManager.connect(...) ya se llamó en AppModule si así se configuró,
-        // o si no, lo conectamos aquí usando config inyectada.
-        // Asumiendo que AppModule lo configuró:
-        // wsManager.connect("ws://" + Config.BASE_URL + ":3020/ws"); <-- Esto ahora lo maneja DI preferiblemente
 
         // Toolbar
         toolbar = findViewById(R.id.top_app_bar);
@@ -141,6 +135,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Conectar cuando la app se vuelve visible
+        if (wsManager != null) {
+            String wsUrl = Config.BASE_URL.replace("http://", "ws://").replace("https://", "wss://") + "/ws";
+            wsManager.connect(wsUrl);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Desconectar cuando la app deja de estar visible para ahorrar recursos
+        if (wsManager != null) {
+            wsManager.disconnect();
+        }
+    }
 
     @Override
     @ExperimentalBadgeUtils
@@ -154,10 +167,7 @@ public class MainActivity extends AppCompatActivity {
             notificationBadge = null;
         }
         
-        // Dejamos que DI maneje el lifecycle de wsManager singleton o lo cerramos si es necesario
-        if (wsManager != null) {
-            wsManager.disconnect();
-        }
+        // wsManager.disconnect() ya se llama en onStop(), pero no está de más aquí por seguridad
     }
     
     public WsManager getWsManager() {

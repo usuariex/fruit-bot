@@ -22,19 +22,15 @@ public class AppModule {
     @Provides
     @Singleton
     public WsManager provideWsManager() {
-        WsManager manager = new WsManager();
-        // Configurar la conexión inicial aquí o dejar que la UI lo haga.
-        // Para inyección global, es mejor instanciarlo.
-        // La conexión se puede manejar en MainActivity o aquí si la URL es estática.
-        manager.connect("ws://" + Config.BASE_URL.replace("http://", "").replace("https://", "") + "/ws");
-        return manager;
+        // Solo devolvemos la instancia. La conexión la gestionará MainActivity.
+        return new WsManager();
     }
 
     @Provides
     @Singleton
     public Retrofit provideRetrofit() {
         return new Retrofit.Builder()
-                .baseUrl(Config.BASE_URL + "/") // Asegurar slash final
+                .baseUrl(Config.BASE_URL + "/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

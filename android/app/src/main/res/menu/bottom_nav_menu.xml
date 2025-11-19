@@ -3,22 +3,22 @@
 
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:icon="@drawable/ic_nav_home"
+        android:title="Inicio" />
 
     <item
         android:id="@+id/searchFragment"
-        android:icon="@drawable/ic_search"
-        android:title="Search" />
+        android:icon="@drawable/ic_nav_search"
+        android:title="Buscar" />
 
     <item
         android:id="@+id/scannerFragment"
-        android:icon="@drawable/ic_search"
-        android:title="Scanner" />
+        android:icon="@drawable/ic_nav_camera"
+        android:title="Escanear" />
 
     <item
         android:id="@+id/profileFragment"
-        android:icon="@drawable/ic_profile"
-        android:title="Profile" />
+        android:icon="@drawable/ic_nav_profile"
+        android:title="Perfil" />
 
 </menu>

@@ -1,92 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/_025_11_12_171014"
-    android:gravity="top|center_horizontal"
-    android:orientation="vertical"
-    android:padding="60dp">
+    android:background="@drawable/_025_11_12_171014">
 
-    <!-- Imagen de usuario genérica -->
-
-    <!-- Campos de login -->
-
-    <ImageView
-        android:id="@+id/imgUser"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="02dp"
-        android:background="@drawable/circle_background"
-        android:backgroundTint="#999999"
-        android:contentDescription="Imagen de usuario"
-        android:padding="16dp"
-        android:scaleType="centerInside" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="20dp" />
-
-    <TextView
-        android:layout_width="185dp"
-        android:layout_height="30dp"
-        android:gravity="center"
-        android:text="INICIAR SESION"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="20dp" />
-    <EditText
-        android:id="@+id/etUsername"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/edittext_background"
-
-        android:hint="Usuario"
-        android:inputType="textPersonName"
-        android:paddingLeft="12dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/edittext_background"
-        android:hint="Contraseña"
-
-        android:inputType="textPassword"
-        android:paddingLeft="12dp" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
-    <!-- Botones -->
-    <Button
-        android:id="@+id/btnLoginConfirm"
-        android:layout_width="wrap_content"
+    <!-- Tarjeta central para contener el login y que resalte sobre el fondo -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="INGRESAR" />
-    <TextView
-        android:id="@+id/tvRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/register_text"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:linksClickable="true" />
-    <Button
-        android:id="@+id/btnBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="200dp"
-        android:background="@drawable/atras"
-        />
+        android:layout_marginHorizontal="32dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#F2FFFFFF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:gravity="center_horizontal">
+
+            <!-- Icono o Imagen de Usuario -->
+            <ImageView
+                android:id="@+id/imgUser"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_nav_profile"
+                app:tint="@color/purple_500"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="#E0E0E0"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bienvenido"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Input Usuario -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Usuario"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:startIconDrawable="@drawable/ic_nav_profile"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Input Contraseña -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Contraseña"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:endIconMode="password_toggle"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Botón Ingresar -->
+            <Button
+                android:id="@+id/btnLoginConfirm"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="INGRESAR"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Link Registro -->
+            <TextView
+                android:id="@+id/tvRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register_text"
+                android:textColor="#555555"
+                android:textSize="14sp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
